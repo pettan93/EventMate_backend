@@ -21,9 +21,9 @@ public class EventResource {
 
     private final TaskRepository taskRepository;
 
-
     @Autowired
-    public EventResource(EventRepository eventRepository, TaskRepository taskRepository) {
+    public EventResource(EventRepository eventRepository,
+                         TaskRepository taskRepository) {
         this.eventRepository = eventRepository;
         this.taskRepository = taskRepository;
     }
@@ -75,12 +75,9 @@ public class EventResource {
     public ResponseEntity<Object> updateEvent(@RequestBody Event event, @PathVariable long id) {
 
         Optional<Event> eventOptional = eventRepository.findById(id);
-
         if (eventOptional.isEmpty())
             return ResponseEntity.notFound().build();
-
         event.setId(id);
-
         eventRepository.save(event);
 
         return ResponseEntity.noContent().build();

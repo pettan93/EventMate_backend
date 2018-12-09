@@ -14,21 +14,22 @@ public class Permission {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private Long idUser;
+    private Long userId;
 
-    private Long idTask;
+    private Long taskId;
 
-    private Long idEvent;
+    private Long eventId;
 
     private UserRole userRole;
+
 
     public Permission() {
     }
 
-    public Permission(Long idUser, Long idTask, Long idEvent, UserRole userRole) {
-        this.idUser = idUser;
-        this.idTask = idTask;
-        this.idEvent = idEvent;
+    public Permission(Long userId, Long taskId, Long eventId, UserRole userRole) {
+        this.userId = userId;
+        this.taskId = taskId;
+        this.eventId = eventId;
         this.userRole = userRole;
     }
 
@@ -40,28 +41,28 @@ public class Permission {
         this.id = id;
     }
 
-    public Long getIdUser() {
-        return idUser;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setIdUser(Long idUser) {
-        this.idUser = idUser;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
-    public Long getIdTask() {
-        return idTask;
+    public Long getTaskId() {
+        return taskId;
     }
 
-    public void setIdTask(Long idTask) {
-        this.idTask = idTask;
+    public void setTaskId(Long taskId) {
+        this.taskId = taskId;
     }
 
-    public Long getIdEvent() {
-        return idEvent;
+    public Long getEventId() {
+        return eventId;
     }
 
-    public void setIdEvent(Long idEvent) {
-        this.idEvent = idEvent;
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
     }
 
     public UserRole getUserRole() {

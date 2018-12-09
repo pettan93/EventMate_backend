@@ -5,6 +5,8 @@ import gr.tei.erasmus.pp.eventmate.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserService {
 
@@ -21,5 +23,13 @@ public class UserService {
 
         return user;
     }
+
+    public void register(List<User> users) {
+        for (User user : users) {
+            register(user);
+        }
+    }
+
+
 
 }

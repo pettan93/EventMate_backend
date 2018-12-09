@@ -1,10 +1,8 @@
 package gr.tei.erasmus.pp.eventmate.backend.models;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Task {
@@ -15,27 +13,27 @@ public class Task {
 
     private String name;
 
-    private  ArrayList<Permission> permissions;
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Permission> permissions;
 
     private String place;
 
     private String description;
 
-    private Byte points;
+    private Long points;
 
-    private  ArrayList<Submission> submissions;
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Submission> submissions;
 
     public Task() {
     }
 
     public Task(String name,
-                ArrayList<Permission> permissions,
                 String place,
                 String description,
-                Byte points,
+                Long points,
                 ArrayList<Submission> submissions) {
         this.name = name;
-        this.permissions = permissions;
         this.place = place;
         this.description = description;
         this.points = points;
@@ -58,7 +56,7 @@ public class Task {
         this.name = name;
     }
 
-    public ArrayList<Permission> getPermissions() {
+    public List<Permission> getPermissions() {
         return permissions;
     }
 
@@ -82,15 +80,15 @@ public class Task {
         this.description = description;
     }
 
-    public Byte getPoints() {
+    public Long getPoints() {
         return points;
     }
 
-    public void setPoints(Byte points) {
+    public void setPoints(Long points) {
         this.points = points;
     }
 
-    public ArrayList<Submission> getSubmissions() {
+    public List<Submission> getSubmissions() {
         return submissions;
     }
 

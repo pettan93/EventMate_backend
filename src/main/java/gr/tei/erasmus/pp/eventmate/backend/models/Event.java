@@ -5,6 +5,7 @@ import gr.tei.erasmus.pp.eventmate.backend.enums.EventState;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 public class Event {
@@ -20,27 +21,35 @@ public class Event {
 
     private String place;
 
-    private ArrayList<Task> tasks;
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Task> tasks;
 
     private EventState state;
 
-    private ArrayList<Report> reports;
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Report> reports;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Permission> permissions;
 
     public Event() {
     }
 
-    public Event(String name,
-                 Date date,
-                 String place,
-                 ArrayList<Task> tasks,
-                 EventState state,
-                 ArrayList<Report> reports) {
+    public Event(String name, Date date, String place, List<Task> tasks, EventState state, List<Report> reports) {
         this.name = name;
         this.date = date;
         this.place = place;
         this.tasks = tasks;
         this.state = state;
         this.reports = reports;
+    }
+
+    public List<Permission> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(List<Permission> permissions) {
+        this.permissions = permissions;
     }
 
     public Long getId() {
@@ -75,7 +84,7 @@ public class Event {
         this.place = place;
     }
 
-    public ArrayList<Task> getTasks() {
+    public List<Task> getTasks() {
         return tasks;
     }
 
@@ -91,11 +100,13 @@ public class Event {
         this.state = state;
     }
 
-    public ArrayList<Report> getReports() {
+    public List<Report> getReports() {
         return reports;
     }
 
     public void setReports(ArrayList<Report> reports) {
         this.reports = reports;
     }
+
+
 }
