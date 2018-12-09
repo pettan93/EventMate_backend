@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.util.Objects;
 
 @Entity
 public class Permission {
@@ -71,5 +72,33 @@ public class Permission {
 
     public void setUserRole(UserRole userRole) {
         this.userRole = userRole;
+    }
+
+    @Override
+    public String toString() {
+        return "Permission{" +
+                "id=" + id +
+                ", userId=" + userId +
+                ", taskId=" + taskId +
+                ", eventId=" + eventId +
+                ", userRole=" + userRole +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Permission that = (Permission) o;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(userId, that.userId) &&
+                Objects.equals(taskId, that.taskId) &&
+                Objects.equals(eventId, that.eventId) &&
+                userRole == that.userRole;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, userId, taskId, eventId, userRole);
     }
 }

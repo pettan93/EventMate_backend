@@ -2,6 +2,7 @@ package gr.tei.erasmus.pp.eventmate.backend.models;
 
 import javax.persistence.*;
 import java.sql.Blob;
+import java.util.Objects;
 
 @Entity
 public class User {
@@ -79,5 +80,36 @@ public class User {
 
     public void setScore(Integer score) {
         this.score = score;
+    }
+
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", userName='" + userName + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", photo=" + photo +
+                ", score=" + score +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id) &&
+                Objects.equals(userName, user.userName) &&
+                Objects.equals(email, user.email) &&
+                Objects.equals(password, user.password) &&
+                Objects.equals(photo, user.photo) &&
+                Objects.equals(score, user.score);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, userName, email, password, photo, score);
     }
 }

@@ -89,19 +89,6 @@ public class StartupBean {
                 new ArrayList<>());
 
 
-        eventRepository.save(event1);
-
-        Permission ownerPermission = new Permission(user1.getId(), null, event1.getId(), UserRole.EVENT_OWNER);
-        Permission guestPermission1 = new Permission(user2.getId(), null, event1.getId(), UserRole.EVENT_GUEST);
-        Permission guestPermission2 = new Permission(user3.getId(), null, event1.getId(), UserRole.EVENT_GUEST);
-        Permission guestPermission3 = new Permission(user4.getId(), null, event1.getId(), UserRole.EVENT_GUEST);
-
-        List<Permission> eventPermissions = Arrays.asList(ownerPermission, guestPermission1, guestPermission2, guestPermission3);
-        event1.setPermissions(new ArrayList<>(eventPermissions));
-
-        eventRepository.save(event1);
-
-
         Task task1 = new Task(
                 "Rakia shots",
                 "Bar",
@@ -110,20 +97,28 @@ public class StartupBean {
                 null
         );
 
-        taskRepository.save(task1);
-
-        Permission taskOwnerPermission = new Permission(user1.getId(), task1.getId(), null, UserRole.TASK_OWNER);
-        Permission asigneePermission1 = new Permission(user2.getId(), task1.getId(), null, UserRole.TASK_ASSIGNEE);
-        Permission asigneePermission2 = new Permission(user3.getId(), task1.getId(), null, UserRole.TASK_ASSIGNEE);
-
-
-        List<Permission> task1Permissions = Arrays.asList(taskOwnerPermission, asigneePermission1, asigneePermission2);
-        task1.setPermissions(new ArrayList<>(task1Permissions));
 
         event1.getTasks().add(task1);
 
         eventRepository.save(event1);
 
+
+        // event permissions
+        Permission ownerPermission = new Permission(user1.getId(), null, event1.getId(), UserRole.EVENT_OWNER);
+        Permission guestPermission1 = new Permission(user2.getId(), null, event1.getId(), UserRole.EVENT_GUEST);
+        Permission guestPermission2 = new Permission(user3.getId(), null, event1.getId(), UserRole.EVENT_GUEST);
+        Permission guestPermission3 = new Permission(user4.getId(), null, event1.getId(), UserRole.EVENT_GUEST);
+        List<Permission> eventPermissions = Arrays.asList(ownerPermission, guestPermission1, guestPermission2, guestPermission3);
+        event1.setPermissions(new ArrayList<>(eventPermissions));
+
+        // tasks permissions
+        Permission taskOwnerPermission = new Permission(user1.getId(), task1.getId(), null, UserRole.TASK_OWNER);
+        Permission asigneePermission1 = new Permission(user2.getId(), task1.getId(), null, UserRole.TASK_ASSIGNEE);
+        Permission asigneePermission2 = new Permission(user3.getId(), task1.getId(), null, UserRole.TASK_ASSIGNEE);
+        List<Permission> task1Permissions = Arrays.asList(taskOwnerPermission, asigneePermission1, asigneePermission2);
+        task1.setPermissions(new ArrayList<>(task1Permissions));
+
+        eventRepository.save(event1);
 
     }
 

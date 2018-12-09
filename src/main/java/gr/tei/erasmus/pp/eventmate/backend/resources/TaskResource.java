@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.ws.rs.NotFoundException;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -19,17 +20,22 @@ public class TaskResource {
         this.taskRepository = taskRepository;
     }
 
-    @GetMapping("/tasks/{id}")
+    @GetMapping("/task")
+    public List<Task> retrieveAllTasks() {
+        return taskRepository.findAll();
+    }
+
+    @GetMapping("/task/{id}")
     public Task retrieveTask(@PathVariable long id) {
         Optional<Task> task = taskRepository.findById(id);
 
         if (task.isEmpty())
-            throw new NotFoundException("student id " + id + " not found");
+            throw new NotFoundException("event id " + id + " not found");
 
         return task.get();
     }
 
-    @PutMapping("/tasks/{id}")
+    @PutMapping("/task/{id}")
     public ResponseEntity<Object> updateTask(@RequestBody Task task, @PathVariable long id) {
 
         Optional<Task> taskOptional = taskRepository.findById(id);

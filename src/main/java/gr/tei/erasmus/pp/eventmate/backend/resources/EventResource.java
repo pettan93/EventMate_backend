@@ -28,22 +28,22 @@ public class EventResource {
         this.taskRepository = taskRepository;
     }
 
-    @GetMapping("/events")
+    @GetMapping("/event")
     public List<Event> retrieveAllEvents() {
         return eventRepository.findAll();
     }
 
-    @GetMapping("/events/{id}")
+    @GetMapping("/event/{id}")
     public Event retrieveEvent(@PathVariable long id) {
         Optional<Event> event = eventRepository.findById(id);
 
         if (event.isEmpty())
-            throw new NotFoundException("student id " + id + " not found");
+            throw new NotFoundException("event id " + id + " not found");
 
         return event.get();
     }
 
-    @PostMapping("/events")
+    @PostMapping("/event")
     public ResponseEntity<Object> createEvent(@RequestBody Event event) {
         Event savedEvent = eventRepository.save(event);
 
@@ -53,7 +53,7 @@ public class EventResource {
         return ResponseEntity.created(location).build();
     }
 
-    @PostMapping("/events/{id}/task")
+    @PostMapping("/event/{id}/task")
     public ResponseEntity<Object> addEventTask(@RequestBody Task task,@PathVariable long id) {
 
         Optional<Event> eventOptional = eventRepository.findById(id);
@@ -71,7 +71,7 @@ public class EventResource {
         return ResponseEntity.created(location).build();
     }
 
-    @PutMapping("/events/{id}")
+    @PutMapping("/event/{id}")
     public ResponseEntity<Object> updateEvent(@RequestBody Event event, @PathVariable long id) {
 
         Optional<Event> eventOptional = eventRepository.findById(id);

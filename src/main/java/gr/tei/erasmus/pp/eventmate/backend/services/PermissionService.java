@@ -1,8 +1,10 @@
 package gr.tei.erasmus.pp.eventmate.backend.services;
 
+import gr.tei.erasmus.pp.eventmate.backend.enums.UserRole;
 import gr.tei.erasmus.pp.eventmate.backend.models.Event;
 import gr.tei.erasmus.pp.eventmate.backend.models.Permission;
 import gr.tei.erasmus.pp.eventmate.backend.models.Task;
+import gr.tei.erasmus.pp.eventmate.backend.models.User;
 import gr.tei.erasmus.pp.eventmate.backend.repository.EventRepository;
 import gr.tei.erasmus.pp.eventmate.backend.repository.PermissionRepository;
 import gr.tei.erasmus.pp.eventmate.backend.repository.TaskRepository;
@@ -10,6 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PermissionService {
@@ -78,6 +83,40 @@ public class PermissionService {
         }
 
         return task;
+    }
+
+    public Optional<List> getModels(Class model, User user) {
+        return getModels(model, user, null);
+    }
+
+    public Optional<List> getModels(Class model, User user, UserRole userRole) {
+
+        List<Permission> permissions = permissionRepository.findPermissionsByUserId(user.getId());
+
+        if (permissions.size() > 0) {
+            if (model.equals(Event.class)) {
+
+                return Optional.of(
+                        eventRepository.findAllById(permissions
+                                .stream()
+                                .filter(permission -> userRole == null || permission.getUserRole().equals(userRole))
+                                .filter(permission -> Objects.nonNull(permission.getEventId()))
+                                .map(Permission::getEventId)
+                                .collect(Collectors.toList())));
+            }
+
+            if (model.equals(Task.class)) {
+                return Optional.of(
+                        taskRepository.findAllById(permissions
+                                .stream()
+                                .filter(permission -> userRole == null || permission.getUserRole().equals(userRole))
+                                .filter(permission -> Objects.nonNull(permission.getTaskId()))
+                                .map(Permission::getTaskId)
+                                .collect(Collectors.toList())));
+            }
+        }
+
+        return Optional.empty();
     }
 
 

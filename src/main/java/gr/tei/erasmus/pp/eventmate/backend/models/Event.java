@@ -6,6 +6,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Event {
@@ -108,5 +109,34 @@ public class Event {
         this.reports = reports;
     }
 
+    @Override
+    public String toString() {
+        return "Event{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", date=" + date +
+                ", place='" + place + '\'' +
+                ", state=" + state +
+                '}';
+    }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Event event = (Event) o;
+        return Objects.equals(id, event.id) &&
+                Objects.equals(name, event.name) &&
+                Objects.equals(date, event.date) &&
+                Objects.equals(place, event.place) &&
+                Objects.equals(tasks, event.tasks) &&
+                state == event.state &&
+                Objects.equals(reports, event.reports) &&
+                Objects.equals(permissions, event.permissions);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, date, place, tasks, state, reports, permissions);
+    }
 }

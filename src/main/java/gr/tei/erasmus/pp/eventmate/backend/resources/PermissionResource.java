@@ -4,16 +4,14 @@ import gr.tei.erasmus.pp.eventmate.backend.models.Event;
 import gr.tei.erasmus.pp.eventmate.backend.models.Permission;
 import gr.tei.erasmus.pp.eventmate.backend.models.Task;
 import gr.tei.erasmus.pp.eventmate.backend.repository.EventRepository;
+import gr.tei.erasmus.pp.eventmate.backend.repository.PermissionRepository;
 import gr.tei.erasmus.pp.eventmate.backend.repository.TaskRepository;
 import gr.tei.erasmus.pp.eventmate.backend.services.EventService;
 import gr.tei.erasmus.pp.eventmate.backend.services.PermissionService;
 import gr.tei.erasmus.pp.eventmate.backend.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -24,6 +22,7 @@ import java.util.Optional;
 public class PermissionResource {
 
     private final PermissionService permissionService;
+    private final PermissionRepository permissionRepository;
 
     private final EventRepository eventRepository;
     private final EventService eventService;
@@ -35,15 +34,23 @@ public class PermissionResource {
 
     @Autowired
     public PermissionResource(PermissionService permissionService,
+                              PermissionRepository permissionRepository,
                               EventRepository eventRepository,
                               EventService eventService,
                               TaskRepository taskRepository,
                               TaskService taskService) {
         this.permissionService = permissionService;
+        this.permissionRepository = permissionRepository;
         this.eventRepository = eventRepository;
         this.eventService = eventService;
         this.taskRepository = taskRepository;
         this.taskService = taskService;
+    }
+
+
+    @GetMapping("/permission")
+    public List<Permission> retrieveAllPermissions() {
+        return permissionRepository.findAll();
     }
 
 
