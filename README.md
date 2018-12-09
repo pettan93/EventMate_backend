@@ -1,6 +1,6 @@
 # EventMate_backend
 
-#### Event endpoint
+### Event endpoint
 GET /event | **List all events**
 
 GET /event/{id} | **Get specific event** 
@@ -15,7 +15,7 @@ GET /me/events | **List of events where is current logged user involved**
 
 GET /me/events/forRole/{userRoleNum} | **List of all events where is current logged user involved, filtered by his role**
 
-#### Task endpoint
+### Task endpoint
 GET /task | **List all tasks** 
 
 GET /task/{id} | **Get specific task** 
@@ -30,7 +30,7 @@ GET /me/event/{id}/tasks | **List of tasks of specific event where is current lo
 
 GET /me/event/{id}/tasks/forRole/{userRoleNum} | **List of tasks of specific event where is current logged user involved, filtered by his role**
 
-#### Permission endpoint
+### Permission endpoint
 POST /permission/event/{id} | **Add permission to event**
 
 POST /permission/task/{id} | **Add permission to task**
@@ -39,10 +39,12 @@ POST /permission/event/{id}/list | **Add a list of permissions to event**
 
 POST /permission/task/{id}/list | **Add a list of permissions permission to task**
 
+### User endpoint
 
-#### Me endpoint
+GET /users | **List all users**
+
+GET /users/details/{id} | **Get specific user**
+
+POST /users/register | **Create new user**
+
  
-
-GET /task/{id} | **Get specific task** 
-
-PUT /task/{id} | **Modify specific task**

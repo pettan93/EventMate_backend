@@ -8,13 +8,16 @@ import gr.tei.erasmus.pp.eventmate.backend.models.UserPrincipal;
 import gr.tei.erasmus.pp.eventmate.backend.repository.EventRepository;
 import gr.tei.erasmus.pp.eventmate.backend.repository.UserRepository;
 import gr.tei.erasmus.pp.eventmate.backend.services.PermissionService;
+import gr.tei.erasmus.pp.eventmate.backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.ws.rs.NotFoundException;
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -24,19 +27,59 @@ public class UserResource {
 
     private final UserRepository userRepository;
 
+    private final UserService userService;
+
     private final PermissionService permissionService;
 
     private final EventRepository eventRepository;
 
+
     @Autowired
     public UserResource(UserRepository userRepository,
-                        PermissionService permissionService,
+                        UserService userService, PermissionService permissionService,
                         EventRepository eventRepository) {
         this.userRepository = userRepository;
+        this.userService = userService;
         this.permissionService = permissionService;
         this.eventRepository = eventRepository;
     }
 
+    @GetMapping("/users")
+    public List<User> getUsers() {
+        return userRepository.findAll();
+    }
+
+    @GetMapping("/users/detail/{id}")
+    public User getUser(@PathVariable Long id) {
+
+        // detail shout see only logged user
+
+        Optional<User> userOptional = userRepository.findById(id);
+
+        if (userOptional.isEmpty()) {
+            throw new NotFoundException("user id " + id + " not found");
+        }
+
+        System.out.println(userOptional.get());
+
+        return userOptional.get();
+    }
+
+
+    @PostMapping("/users/register")
+    public ResponseEntity<Object> registerNewUser(
+            @RequestParam String userName,
+            @RequestParam String email,
+            @RequestParam String password) {
+
+
+        User newUser = userService.register(userName,email,password);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(newUser.getId()).toUri();
+
+        return ResponseEntity.created(location).build();
+    }
 
     @GetMapping("/me/events")
     public List<Event> retrieveAllMyEvents() {
@@ -47,7 +90,7 @@ public class UserResource {
         var result = permissionService.getModels(Event.class, user);
 
         if (result.isEmpty()) {
-            return null;
+            return new ArrayList<>();
         }
 
         return (List<Event>) result.get();
