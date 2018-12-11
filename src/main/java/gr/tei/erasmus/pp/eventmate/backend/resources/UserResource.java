@@ -44,6 +44,17 @@ public class UserResource {
         this.eventRepository = eventRepository;
     }
 
+    @PostMapping("/public/register")
+    public ResponseEntity<Object> registerNewUser(@RequestBody User user) {
+
+        User newUser = userService.register(user);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(newUser.getId()).toUri();
+
+        return ResponseEntity.created(location).build();
+    }
+
     @GetMapping("/users")
     public List<User> getUsers() {
         return userRepository.findAll();
@@ -65,21 +76,6 @@ public class UserResource {
         return userOptional.get();
     }
 
-
-    @PostMapping("/users/register")
-    public ResponseEntity<Object> registerNewUser(
-            @RequestParam String userName,
-            @RequestParam String email,
-            @RequestParam String password) {
-
-
-        User newUser = userService.register(userName,email,password);
-
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(newUser.getId()).toUri();
-
-        return ResponseEntity.created(location).build();
-    }
 
     @GetMapping("/me/events")
     public List<Event> retrieveAllMyEvents() {
