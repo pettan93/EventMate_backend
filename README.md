@@ -13,7 +13,7 @@
 - [ ] Chat system
 - [ ] Register via Google / Facebook
 - [ ] Report generating
-- [ ] File managemen
+- [ ] File management
 
 
 
