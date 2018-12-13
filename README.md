@@ -28,6 +28,10 @@ POST /event/{id}/task | **Add task to event**
 
 PUT /event/{id} | **Modify specific event**
 
+POST /event/{id}/invitation | **Invite user to event**
+
+POST /event/{id}/invitation/list | **Invite list of to event**
+
 GET /me/events | **List of events where is current logged user involved**
 
 GET /me/events/forRole/{userRoleNum} | **List of all events where is current logged user involved, filtered by his role**
@@ -62,6 +66,9 @@ GET /users | **List all users**
 
 GET /users/details/{id} | **Get specific user**
 
-POST /users/register | **Create new user**
+
+### Public endpoint
+
+POST /public/register | **Create new user**
 
  
