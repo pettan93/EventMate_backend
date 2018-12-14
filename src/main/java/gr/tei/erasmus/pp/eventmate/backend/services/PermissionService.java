@@ -119,5 +119,30 @@ public class PermissionService {
         return Optional.empty();
     }
 
+    public Boolean hasPermission(User user, Event event) {
+
+        return !event.getPermissions()
+                .stream()
+                .filter(permission -> permission.getUserId().equals(user.getId()))
+                .collect(Collectors.toList()).isEmpty();
+    }
+
+    public Boolean hasPermissionRole(User user, Event event, UserRole userRole) {
+
+        return !event.getPermissions()
+                .stream()
+                .filter(permission -> permission.getUserId().equals(user.getId()))
+                .filter(permission -> permission.getUserRole().equals(userRole))
+                .collect(Collectors.toList()).isEmpty();
+    }
+
+    public Boolean hasPermissionRole(User user, Task task, UserRole userRole) {
+
+        return !task.getPermissions()
+                .stream()
+                .filter(permission -> permission.getUserId().equals(user.getId()))
+                .filter(permission -> permission.getUserRole().equals(userRole))
+                .collect(Collectors.toList()).isEmpty();
+    }
 
 }
