@@ -3,7 +3,6 @@ package gr.tei.erasmus.pp.eventmate.backend.models;
 import gr.tei.erasmus.pp.eventmate.backend.enums.EventState;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -50,14 +49,6 @@ public class Event {
         this.reports = reports;
     }
 
-    public List<Permission> getPermissions() {
-        return permissions;
-    }
-
-    public void setPermissions(List<Permission> permissions) {
-        this.permissions = permissions;
-    }
-
     public Long getId() {
         return id;
     }
@@ -94,7 +85,7 @@ public class Event {
         return tasks;
     }
 
-    public void setTasks(ArrayList<Task> tasks) {
+    public void setTasks(List<Task> tasks) {
         this.tasks = tasks;
     }
 
@@ -110,16 +101,16 @@ public class Event {
         return reports;
     }
 
-    public void setReports(ArrayList<Report> reports) {
-        this.reports = reports;
-    }
-
-    public void setTasks(List<Task> tasks) {
-        this.tasks = tasks;
-    }
-
     public void setReports(List<Report> reports) {
         this.reports = reports;
+    }
+
+    public List<Permission> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(List<Permission> permissions) {
+        this.permissions = permissions;
     }
 
     public List<Invitation> getInvitations() {

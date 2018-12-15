@@ -24,6 +24,11 @@ public class EventService {
         this.taskRepository = taskRepository;
     }
 
+    public Event createEvent(Event event){
+
+        return eventRepository.save(event);
+    }
+
     public Event updateEvent(Long id, Event event) {
         event.setId(id);
         return eventRepository.save(event);

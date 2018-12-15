@@ -7,6 +7,7 @@ import gr.tei.erasmus.pp.eventmate.backend.repository.TaskRepository;
 import gr.tei.erasmus.pp.eventmate.backend.services.EventService;
 import gr.tei.erasmus.pp.eventmate.backend.services.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +40,12 @@ public class EventResource {
     }
 
 
+    @GetMapping("/events")
+    public ResponseEntity<Object> all() {
+        return ResponseEntity.ok(eventRepository.findAll());
+    }
+
+
     /**
      * Permission: Everyone involved in event
      */
@@ -51,7 +58,7 @@ public class EventResource {
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
-        if (permissionService.hasPermission(user, event.get()))
+        if (!permissionService.hasPermission(user, event.get()))
             return ResponseEntity.status(403).build();
 
 
@@ -63,12 +70,10 @@ public class EventResource {
      */
     @PostMapping("/event")
     public ResponseEntity<Object> createEvent(@RequestBody Event event) {
-        Event savedEvent = eventRepository.save(event);
 
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(savedEvent.getId()).toUri();
+        Event savedEvent = eventService.createEvent(event);
 
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedEvent);
     }
 
     /**
@@ -84,15 +89,14 @@ public class EventResource {
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
-        if (permissionService.hasPermission(user, eventOptional.get()))
+        if (!permissionService.hasPermission(user, eventOptional.get()))
             return ResponseEntity.status(403).build();
 
-        eventService.addTask(eventOptional.get(), task);
 
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(eventOptional.get().getId()).toUri();
+        Event savedEvent = eventService.addTask(eventOptional.get(), task);
 
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedEvent);
+
     }
 
     /**
@@ -108,11 +112,11 @@ public class EventResource {
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
-        if (permissionService.hasPermissionRole(user, eventOptional.get(), UserRole.EVENT_OWNER))
+        if (!permissionService.hasPermissionRole(user, eventOptional.get(), UserRole.EVENT_OWNER))
             return ResponseEntity.status(403).build();
 
 
-        return ResponseEntity.ok(updateEvent(event,eventOptional.get().getId()));
+        return ResponseEntity.ok(updateEvent(event, eventOptional.get().getId()));
     }
 
     /**
@@ -128,7 +132,7 @@ public class EventResource {
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
-        if (permissionService.hasPermission(user, eventOptional.get()))
+        if (!permissionService.hasPermission(user, eventOptional.get()))
             return ResponseEntity.status(403).build();
 
         eventService.addInvitation(eventOptional.get(), invitation);
@@ -152,7 +156,7 @@ public class EventResource {
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
-        if (permissionService.hasPermission(user, eventOptional.get()))
+        if (!permissionService.hasPermission(user, eventOptional.get()))
             return ResponseEntity.status(403).build();
 
         eventService.addInvitations(eventOptional.get(), invitations);
