@@ -2,6 +2,7 @@ package gr.tei.erasmus.pp.eventmate.backend.services;
 
 import gr.tei.erasmus.pp.eventmate.backend.models.Event;
 import gr.tei.erasmus.pp.eventmate.backend.models.Invitation;
+import gr.tei.erasmus.pp.eventmate.backend.repository.InvitationRepository;
 import gr.tei.erasmus.pp.eventmate.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,12 +12,14 @@ public class InvitationService {
 
     private final UserRepository userRepository;
 
-    private final InvitationService invitationService;
+    private final InvitationRepository invitationRepository;
+
 
     @Autowired
-    public InvitationService(UserRepository userRepository, InvitationService invitationService) {
+    public InvitationService(UserRepository userRepository,
+                             InvitationRepository invitationRepository) {
         this.userRepository = userRepository;
-        this.invitationService = invitationService;
+        this.invitationRepository = invitationRepository;
     }
 
 

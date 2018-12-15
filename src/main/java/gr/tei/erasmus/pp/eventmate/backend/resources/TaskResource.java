@@ -28,8 +28,8 @@ public class TaskResource {
 
     @Autowired
     public TaskResource(TaskRepository taskRepository,
-                        TaskResource taskResource,
-                        TaskService taskService, PermissionService permissionService,
+                        TaskService taskService,
+                        PermissionService permissionService,
                         EventService eventService) {
         this.taskRepository = taskRepository;
         this.taskService = taskService;

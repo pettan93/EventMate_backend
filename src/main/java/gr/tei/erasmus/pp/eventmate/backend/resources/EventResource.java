@@ -5,7 +5,6 @@ import gr.tei.erasmus.pp.eventmate.backend.models.*;
 import gr.tei.erasmus.pp.eventmate.backend.repository.EventRepository;
 import gr.tei.erasmus.pp.eventmate.backend.repository.TaskRepository;
 import gr.tei.erasmus.pp.eventmate.backend.services.EventService;
-import gr.tei.erasmus.pp.eventmate.backend.services.InvitationService;
 import gr.tei.erasmus.pp.eventmate.backend.services.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,20 +25,16 @@ public class EventResource {
 
     private final TaskRepository taskRepository;
 
-    private final InvitationService invitationService;
-
     private final PermissionService permissionService;
 
     @Autowired
     public EventResource(EventRepository eventRepository,
                          EventService eventService,
                          TaskRepository taskRepository,
-                         InvitationService invitationService,
                          PermissionService permissionService) {
         this.eventRepository = eventRepository;
         this.eventService = eventService;
         this.taskRepository = taskRepository;
-        this.invitationService = invitationService;
         this.permissionService = permissionService;
     }
 

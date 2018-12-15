@@ -3,11 +3,7 @@ package gr.tei.erasmus.pp.eventmate.backend.models;
 import gr.tei.erasmus.pp.eventmate.backend.enums.InvitationState;
 import gr.tei.erasmus.pp.eventmate.backend.enums.InvitationType;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import java.util.Objects;
+import javax.persistence.*;
 
 @Entity
 public class Invitation {
@@ -16,6 +12,7 @@ public class Invitation {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @OneToOne
     private User user;
 
     private String email;

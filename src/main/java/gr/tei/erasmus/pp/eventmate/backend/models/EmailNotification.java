@@ -1,9 +1,6 @@
 package gr.tei.erasmus.pp.eventmate.backend.models;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class EmailNotification {
@@ -12,8 +9,10 @@ public class EmailNotification {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @OneToOne
     private Invitation invitation;
 
+    @OneToOne
     private Event event;
 
     private String content;
@@ -30,6 +29,43 @@ public class EmailNotification {
         this.stamp = stamp;
     }
 
+    public Long getId() {
+        return id;
+    }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
 
+    public Invitation getInvitation() {
+        return invitation;
+    }
+
+    public void setInvitation(Invitation invitation) {
+        this.invitation = invitation;
+    }
+
+    public Event getEvent() {
+        return event;
+    }
+
+    public void setEvent(Event event) {
+        this.event = event;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getStamp() {
+        return stamp;
+    }
+
+    public void setStamp(String stamp) {
+        this.stamp = stamp;
+    }
 }
