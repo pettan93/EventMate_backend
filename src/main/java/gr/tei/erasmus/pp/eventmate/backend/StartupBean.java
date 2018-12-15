@@ -68,10 +68,10 @@ public class StartupBean {
 
     private void generateDummyStructure() {
 
-        User user1 = new User("user1", "user1@email", passwordEncoder.encode("pass"), null, 0);
-        User user2 = new User("user2", "user2@email", passwordEncoder.encode("pass"), null, 0);
-        User user3 = new User("user3", "user3@email", passwordEncoder.encode("pass"), null, 0);
-        User user4 = new User("user4", "user4@email", passwordEncoder.encode("pass"), null, 0);
+        User user1 = new User("user1", "user1@email", "pass", null, 0);
+        User user2 = new User("user2", "user2@email", "pass", null, 0);
+        User user3 = new User("user3", "user3@email", "pass", null, 0);
+        User user4 = new User("user4", "user4@email", "pass", null, 0);
 
         userService.register(Arrays.asList(user1, user2, user3, user4));
 

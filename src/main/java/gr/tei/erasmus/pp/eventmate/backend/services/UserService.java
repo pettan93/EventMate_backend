@@ -20,19 +20,8 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-
-    public User register(String userName, String email, String password) {
-
-        User newUser = new User();
-        newUser.setUserName(userName);
-        newUser.setUserName(userName);
-        newUser.setPassword(passwordEncoder.encode(password));
-
-        return userRepository.save(newUser);
-    }
-
-
     public User register(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
         return user;
     }

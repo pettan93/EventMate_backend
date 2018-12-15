@@ -33,6 +33,11 @@ public class Event {
     @OneToMany(cascade = CascadeType.ALL)
     private List<Permission> permissions;
 
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Invitation> invitations;
+
+
     public Event() {
     }
 
@@ -107,6 +112,22 @@ public class Event {
 
     public void setReports(ArrayList<Report> reports) {
         this.reports = reports;
+    }
+
+    public void setTasks(List<Task> tasks) {
+        this.tasks = tasks;
+    }
+
+    public void setReports(List<Report> reports) {
+        this.reports = reports;
+    }
+
+    public List<Invitation> getInvitations() {
+        return invitations;
+    }
+
+    public void setInvitations(List<Invitation> invitations) {
+        this.invitations = invitations;
     }
 
     @Override
