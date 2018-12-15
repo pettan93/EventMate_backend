@@ -1,12 +1,14 @@
-package gr.tei.erasmus.pp.eventmate.backend.models;
+package gr.tei.erasmus.pp.eventmate.backend.DTOs;
 
-import javax.persistence.*;
+import gr.tei.erasmus.pp.eventmate.backend.models.Submission;
+
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.sql.Blob;
-import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-public class Task {
+public class TaskDTO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -14,34 +16,21 @@ public class Task {
 
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<Permission> permissions;
-
     private String place;
 
     private String description;
 
     private Long points;
 
-    @OneToMany(cascade = CascadeType.ALL)
     private List<Submission> submissions;
 
     private Blob photo;
 
-    public Task() {
-    }
+    private Integer submissionsCount;
 
-    public Task(String name,
-                String place,
-                String description,
-                Long points,
-                ArrayList<Submission> submissions) {
-        this.name = name;
-        this.place = place;
-        this.description = description;
-        this.points = points;
-        this.submissions = submissions;
-    }
+    private UserDTO taskOwner;
+
+    private List<UserDTO> assignees;
 
     public Long getId() {
         return id;
@@ -57,14 +46,6 @@ public class Task {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public List<Permission> getPermissions() {
-        return permissions;
-    }
-
-    public void setPermissions(ArrayList<Permission> permissions) {
-        this.permissions = permissions;
     }
 
     public String getPlace() {
@@ -95,7 +76,39 @@ public class Task {
         return submissions;
     }
 
-    public void setSubmissions(ArrayList<Submission> submissions) {
+    public void setSubmissions(List<Submission> submissions) {
         this.submissions = submissions;
+    }
+
+    public Blob getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(Blob photo) {
+        this.photo = photo;
+    }
+
+    public Integer getSubmissionsCount() {
+        return submissionsCount;
+    }
+
+    public void setSubmissionsCount(Integer submissionsCount) {
+        this.submissionsCount = submissionsCount;
+    }
+
+    public UserDTO getTaskOwner() {
+        return taskOwner;
+    }
+
+    public void setTaskOwner(UserDTO taskOwner) {
+        this.taskOwner = taskOwner;
+    }
+
+    public List<UserDTO> getAssignees() {
+        return assignees;
+    }
+
+    public void setAssignees(List<UserDTO> assignees) {
+        this.assignees = assignees;
     }
 }

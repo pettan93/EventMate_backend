@@ -37,6 +37,11 @@ public class TaskResource {
         this.eventService = eventService;
     }
 
+    @GetMapping("/tasks")
+    public ResponseEntity<Object> all() {
+        return ResponseEntity.ok(taskRepository.findAll());
+    }
+
     /**
      * Permission: Everyone involved in parent event
      */

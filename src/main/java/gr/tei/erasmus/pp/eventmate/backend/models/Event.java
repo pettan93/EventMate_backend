@@ -3,6 +3,7 @@ package gr.tei.erasmus.pp.eventmate.backend.models;
 import gr.tei.erasmus.pp.eventmate.backend.enums.EventState;
 
 import javax.persistence.*;
+import java.sql.Blob;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -36,6 +37,8 @@ public class Event {
     @OneToMany(cascade = CascadeType.ALL)
     private List<Invitation> invitations;
 
+    private Blob photo;
+
 
     public Event() {
     }
@@ -47,6 +50,14 @@ public class Event {
         this.tasks = tasks;
         this.state = state;
         this.reports = reports;
+    }
+
+    public Blob getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(Blob photo) {
+        this.photo = photo;
     }
 
     public Long getId() {

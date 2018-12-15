@@ -3,17 +3,16 @@ package gr.tei.erasmus.pp.eventmate.backend.resources;
 import gr.tei.erasmus.pp.eventmate.backend.enums.UserRole;
 import gr.tei.erasmus.pp.eventmate.backend.models.*;
 import gr.tei.erasmus.pp.eventmate.backend.repository.EventRepository;
-import gr.tei.erasmus.pp.eventmate.backend.repository.TaskRepository;
 import gr.tei.erasmus.pp.eventmate.backend.services.EventService;
 import gr.tei.erasmus.pp.eventmate.backend.services.PermissionService;
+import gr.tei.erasmus.pp.eventmate.backend.services.TaskService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,25 +23,20 @@ public class EventResource {
 
     private final EventService eventService;
 
-    private final TaskRepository taskRepository;
+    private final TaskService taskService;
 
     private final PermissionService permissionService;
 
     @Autowired
     public EventResource(EventRepository eventRepository,
                          EventService eventService,
-                         TaskRepository taskRepository,
-                         PermissionService permissionService) {
+                         TaskService taskService,
+                         PermissionService permissionService,
+                         ModelMapper modelMapper) {
         this.eventRepository = eventRepository;
         this.eventService = eventService;
-        this.taskRepository = taskRepository;
+        this.taskService = taskService;
         this.permissionService = permissionService;
-    }
-
-
-    @GetMapping("/events")
-    public ResponseEntity<Object> all() {
-        return ResponseEntity.ok(eventRepository.findAll());
     }
 
 
@@ -62,7 +56,26 @@ public class EventResource {
             return ResponseEntity.status(403).build();
 
 
-        return ResponseEntity.ok(event.get());
+        return ResponseEntity.ok(eventService.convertToDto(event.get()));
+    }
+
+    /**
+     * Permission: Everyone involved in event
+     */
+    @GetMapping("/event/{id}/dto")
+    public ResponseEntity<Object> retrieveEventDto(@PathVariable long id) {
+        Optional<Event> event = eventRepository.findById(id);
+
+        if (event.isEmpty())
+            return ResponseEntity.notFound().build();
+
+        User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+
+        if (!permissionService.hasPermission(user, event.get()))
+            return ResponseEntity.status(403).build();
+
+
+        return ResponseEntity.ok(eventService.convertToDto(event.get()));
     }
 
     /**
@@ -71,9 +84,13 @@ public class EventResource {
     @PostMapping("/event")
     public ResponseEntity<Object> createEvent(@RequestBody Event event) {
 
+        User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+
         Event savedEvent = eventService.createEvent(event);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedEvent);
+        permissionService.addPermissionNew(event, user, UserRole.EVENT_OWNER);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(eventService.convertToDto(savedEvent));
     }
 
     /**
@@ -93,9 +110,11 @@ public class EventResource {
             return ResponseEntity.status(403).build();
 
 
-        Event savedEvent = eventService.addTask(eventOptional.get(), task);
+        Task savedTask = taskService.createTask(task);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedEvent);
+        eventService.addTask(eventOptional.get(), task);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(taskService.convertToDto(savedTask));
 
     }
 
@@ -115,8 +134,9 @@ public class EventResource {
         if (!permissionService.hasPermissionRole(user, eventOptional.get(), UserRole.EVENT_OWNER))
             return ResponseEntity.status(403).build();
 
+        Event updatedEvent = eventService.updateEvent(eventOptional.get().getId(),event);
 
-        return ResponseEntity.ok(updateEvent(event, eventOptional.get().getId()));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(eventService.convertToDto(updatedEvent));
     }
 
     /**
@@ -137,10 +157,8 @@ public class EventResource {
 
         eventService.addInvitation(eventOptional.get(), invitation);
 
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(eventOptional.get().getId()).toUri();
 
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(eventService.convertToDto(eventOptional.get()));
     }
 
     /**
@@ -161,10 +179,7 @@ public class EventResource {
 
         eventService.addInvitations(eventOptional.get(), invitations);
 
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(eventOptional.get().getId()).toUri();
-
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(eventService.convertToDto(eventOptional.get()));
     }
 
 
