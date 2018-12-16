@@ -1,32 +1,86 @@
 package gr.tei.erasmus.pp.eventmate.backend.resources;
 
+import gr.tei.erasmus.pp.eventmate.backend.models.Event;
+import gr.tei.erasmus.pp.eventmate.backend.models.Invitation;
+import gr.tei.erasmus.pp.eventmate.backend.models.User;
+import gr.tei.erasmus.pp.eventmate.backend.models.UserPrincipal;
 import gr.tei.erasmus.pp.eventmate.backend.repository.EventRepository;
 import gr.tei.erasmus.pp.eventmate.backend.repository.UserRepository;
+import gr.tei.erasmus.pp.eventmate.backend.services.EventService;
 import gr.tei.erasmus.pp.eventmate.backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class InvitationResource {
 
-    private final UserRepository userRepository;
-
-    private final UserService userService;
-
-
-    private final EventRepository eventRepository;
-
-
     @Autowired
-    public InvitationResource(UserRepository userRepository,
-                              UserService userService,
-                              EventRepository eventRepository) {
-        this.userRepository = userRepository;
-        this.userService = userService;
-        this.eventRepository = eventRepository;
-    }
+    private UserRepository userRepository;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private EventService eventService;
+    @Autowired
+    private EventRepository eventRepository;
+
+
 
 
     // TODO /me/invitations
+
+
+    /**
+     * Permission: Everyone involved in event
+     */
+    @PostMapping("/event/{id}/invitation/list")
+    public ResponseEntity<Object> inviteUsers(@RequestBody List<Invitation> invitations, @PathVariable long id) {
+
+        Optional<Event> eventOptional = eventRepository.findById(id);
+
+        if (eventOptional.isEmpty())
+            return ResponseEntity.notFound().build();
+
+        User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+
+        if (!eventService.hasPermission(user, eventOptional.get()))
+            return ResponseEntity.status(403).build();
+
+        eventService.addInvitations(eventOptional.get(), invitations);
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(eventService.convertToDto(eventOptional.get()));
+    }
+
+    /**
+     * Permission: Everyone involved in event
+     */
+    @PostMapping("/event/{id}/invitation")
+    public ResponseEntity<Object> inviteUsers(@RequestBody Invitation invitation, @PathVariable long id) {
+
+        Optional<Event> eventOptional = eventRepository.findById(id);
+
+        if (eventOptional.isEmpty())
+            return ResponseEntity.notFound().build();
+
+        User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+
+        if (!eventService.hasPermission(user, eventOptional.get()))
+            return ResponseEntity.status(403).build();
+
+        eventService.addInvitation(eventOptional.get(), invitation);
+
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(eventService.convertToDto(eventOptional.get()));
+    }
+
+
 }
 

@@ -1,11 +1,13 @@
 package gr.tei.erasmus.pp.eventmate.backend.resources;
 
+import gr.tei.erasmus.pp.eventmate.backend.enums.InvitationState;
 import gr.tei.erasmus.pp.eventmate.backend.models.Event;
 import gr.tei.erasmus.pp.eventmate.backend.models.User;
 import gr.tei.erasmus.pp.eventmate.backend.models.UserPrincipal;
 import gr.tei.erasmus.pp.eventmate.backend.repository.EventRepository;
 import gr.tei.erasmus.pp.eventmate.backend.repository.UserRepository;
 import gr.tei.erasmus.pp.eventmate.backend.services.EventService;
+import gr.tei.erasmus.pp.eventmate.backend.services.InvitationService;
 import gr.tei.erasmus.pp.eventmate.backend.services.TaskService;
 import gr.tei.erasmus.pp.eventmate.backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,29 +21,19 @@ import java.util.stream.Collectors;
 
 @RestController
 public class UserResource {
-
-    private final UserRepository userRepository;
-
-    private final UserService userService;
-
-    private final EventRepository eventRepository;
-
-    private final EventService eventService;
-
-    private final TaskService taskService;
-
     @Autowired
-    public UserResource(UserRepository userRepository,
-                        UserService userService,
-                        EventRepository eventRepository,
-                        EventService eventService,
-                        TaskService taskService) {
-        this.userRepository = userRepository;
-        this.userService = userService;
-        this.eventRepository = eventRepository;
-        this.eventService = eventService;
-        this.taskService = taskService;
-    }
+    private UserRepository userRepository;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private EventRepository eventRepository;
+    @Autowired
+    private EventService eventService;
+    @Autowired
+    private TaskService taskService;
+    @Autowired
+    private InvitationService invitationService;
+
 
     @PostMapping("/public/register")
     public ResponseEntity<Object> registerNewUser(@RequestBody User user) {
@@ -74,6 +66,19 @@ public class UserResource {
                 .body(userService.convertToDto(user));
     }
 
+    @GetMapping("/me/invitations")
+    public ResponseEntity<Object> getMyInvitations() {
+
+        User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+
+        return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body(invitationService.getUserInvitations(user)
+                        .stream()
+                        .filter(invitation -> invitation.getInvitationState().equals(InvitationState.PENDING))
+                        .map(invitation -> invitationService.convertToDto(invitation))
+                        .collect(Collectors.toList()));
+    }
 
     @GetMapping("/me/events")
     public ResponseEntity<Object> retrieveAllMyEvents() {
@@ -94,7 +99,6 @@ public class UserResource {
                         .map(eventService::convertToDto)
                         .collect(Collectors.toList()));
     }
-
 
 
     @GetMapping("/me/tasks")
@@ -140,7 +144,6 @@ public class UserResource {
                         .map(taskService::convertToDto)
                         .collect(Collectors.toList()));
     }
-
 
 
 }

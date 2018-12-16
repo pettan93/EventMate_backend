@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -123,28 +122,6 @@ public class EventResource {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(eventService.convertToDto(updatedEvent));
     }
 
-    /**
-     * Permission: Everyone involved in event
-     */
-    @PostMapping("/event/{id}/invitation")
-    public ResponseEntity<Object> inviteUsers(@RequestBody Invitation invitation, @PathVariable long id) {
-
-        Optional<Event> eventOptional = eventRepository.findById(id);
-
-        if (eventOptional.isEmpty())
-            return ResponseEntity.notFound().build();
-
-        User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
-
-        if (!eventService.hasPermission(user, eventOptional.get()))
-            return ResponseEntity.status(403).build();
-
-        eventService.addInvitation(eventOptional.get(), invitation);
-
-
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(eventService.convertToDto(eventOptional.get()));
-    }
-
 
     /**
      * Permission: EventOwner
@@ -170,26 +147,7 @@ public class EventResource {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(eventService.convertToDto(savedEvent));
     }
 
-    /**
-     * Permission: Everyone involved in event
-     */
-    @PostMapping("/event/{id}/invitation/list")
-    public ResponseEntity<Object> inviteUsers(@RequestBody List<Invitation> invitations, @PathVariable long id) {
 
-        Optional<Event> eventOptional = eventRepository.findById(id);
-
-        if (eventOptional.isEmpty())
-            return ResponseEntity.notFound().build();
-
-        User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
-
-        if (!eventService.hasPermission(user, eventOptional.get()))
-            return ResponseEntity.status(403).build();
-
-        eventService.addInvitations(eventOptional.get(), invitations);
-
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(eventService.convertToDto(eventOptional.get()));
-    }
 
 
 }
