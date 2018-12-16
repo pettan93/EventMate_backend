@@ -122,6 +122,20 @@ public class EventService {
         return eventRepository.save(event);
     }
 
+    public Event pushEventState(Event event){
+
+        event.setState(EventState.next(event.getState()));
+
+        eventRepository.save(event);
+
+        return event;
+    }
+
+
+    public Boolean isEditable(Event event){
+        return event.getState().equals(EventState.EDITABLE);
+    }
+
 
     public Boolean alreadyInvited(Event event, Invitation invitation) {
 

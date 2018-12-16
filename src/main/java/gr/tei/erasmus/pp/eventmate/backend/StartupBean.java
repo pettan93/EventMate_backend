@@ -3,6 +3,7 @@ package gr.tei.erasmus.pp.eventmate.backend;
 import gr.tei.erasmus.pp.eventmate.backend.enums.EventState;
 import gr.tei.erasmus.pp.eventmate.backend.enums.InvitationState;
 import gr.tei.erasmus.pp.eventmate.backend.enums.InvitationType;
+import gr.tei.erasmus.pp.eventmate.backend.enums.TaskState;
 import gr.tei.erasmus.pp.eventmate.backend.models.Event;
 import gr.tei.erasmus.pp.eventmate.backend.models.Invitation;
 import gr.tei.erasmus.pp.eventmate.backend.models.Task;
@@ -101,6 +102,7 @@ public class StartupBean {
                 null
         );
 
+        task1.setTaskState(TaskState.EDITABLE);
 
         task1.setTaskOwner(user1);
         task1.setAssignees(Arrays.asList(user2,user3));

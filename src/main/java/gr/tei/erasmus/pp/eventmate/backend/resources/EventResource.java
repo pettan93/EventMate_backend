@@ -88,6 +88,9 @@ public class EventResource {
         if (!eventService.hasPermission(user, eventOptional.get()))
             return ResponseEntity.status(403).build();
 
+        if(!eventService.isEditable(eventOptional.get()))
+            return ResponseEntity.status(400).body("Event is no longer in editable mode.");
+
 
         Task savedTask = taskService.createTask(user,task);
 
@@ -140,6 +143,31 @@ public class EventResource {
 
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(eventService.convertToDto(eventOptional.get()));
+    }
+
+
+    /**
+     * Permission: EventOwner
+     */
+    @PostMapping("/event/{id}/pushState")
+    public ResponseEntity<Object> pushState(@PathVariable long id) {
+
+        Optional<Event> eventOptional = eventRepository.findById(id);
+
+        if (eventOptional.isEmpty())
+            return ResponseEntity.notFound().build();
+
+        User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+
+        if (!eventService.isOwner(user, eventOptional.get()))
+            return ResponseEntity.status(403).build();
+
+
+
+        Event savedEvent = eventService.pushEventState(eventOptional.get());
+
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(eventService.convertToDto(savedEvent));
     }
 
     /**

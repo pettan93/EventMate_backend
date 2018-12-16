@@ -8,6 +8,7 @@ import gr.tei.erasmus.pp.eventmate.backend.repository.TaskRepository;
 import gr.tei.erasmus.pp.eventmate.backend.services.EventService;
 import gr.tei.erasmus.pp.eventmate.backend.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -77,6 +78,28 @@ public class TaskResource {
     }
 
 
+    /**
+     * Permission: TaskOwner
+     */
+    @PostMapping("/task/{id}/pushState")
+    public ResponseEntity<Object> pushState(@PathVariable long id) {
+
+        Optional<Task> taskOptional = taskRepository.findById(id);
+
+        if (taskOptional.isEmpty())
+            return ResponseEntity.notFound().build();
+
+        User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+
+        if (!taskService.isOwner(user, taskOptional.get()))
+            return ResponseEntity.status(403).build();
+
+
+        Task savedTask = taskService.pushTaskState(taskOptional.get());
+
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(taskService.convertToDto(savedTask));
+    }
 
 
 }

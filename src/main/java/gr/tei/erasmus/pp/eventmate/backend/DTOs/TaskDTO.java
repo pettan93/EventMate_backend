@@ -1,5 +1,6 @@
 package gr.tei.erasmus.pp.eventmate.backend.DTOs;
 
+import gr.tei.erasmus.pp.eventmate.backend.enums.TaskState;
 import gr.tei.erasmus.pp.eventmate.backend.models.Submission;
 
 import javax.persistence.GeneratedValue;
@@ -26,6 +27,14 @@ public class TaskDTO {
 
     private Blob photo;
 
+    private TaskState taskState;
+
+    private Boolean timeLimited;
+
+    private Integer remainingTime;
+
+    private Integer timeLimit;
+
     /************/
 
     private Integer submissionsCount;
@@ -34,7 +43,41 @@ public class TaskDTO {
 
     private List<UserDTO> assignees;
 
+    public TaskState getTaskState() {
+        return taskState;
+    }
+
+    public void setTaskState(TaskState taskState) {
+        this.taskState = taskState;
+    }
+
+    public Boolean getTimeLimited() {
+        return timeLimited;
+    }
+
+    public void setTimeLimited(Boolean timeLimited) {
+        this.timeLimited = timeLimited;
+    }
+
+    public Integer getRemainingTime() {
+        return remainingTime;
+    }
+
+    public void setRemainingTime(Integer remainingTime) {
+        this.remainingTime = remainingTime;
+    }
+
+    public Integer getTimeLimit() {
+        return timeLimit;
+    }
+
+    public void setTimeLimit(Integer timeLimit) {
+        this.timeLimit = timeLimit;
+    }
+
     /************/
+
+
 
 
     public Long getId() {

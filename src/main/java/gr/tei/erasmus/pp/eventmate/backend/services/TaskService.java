@@ -1,6 +1,7 @@
 package gr.tei.erasmus.pp.eventmate.backend.services;
 
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.TaskDTO;
+import gr.tei.erasmus.pp.eventmate.backend.enums.TaskState;
 import gr.tei.erasmus.pp.eventmate.backend.models.Task;
 import gr.tei.erasmus.pp.eventmate.backend.models.User;
 import gr.tei.erasmus.pp.eventmate.backend.repository.TaskRepository;
@@ -22,35 +23,46 @@ public class TaskService {
     @Autowired
     private UserService userService;
 
-    public Boolean hasPermission(User user, Task task){
+    public Boolean hasPermission(User user, Task task) {
         return task.getAssignees().contains(user) || task.getTaskOwner().equals(user);
     }
 
-    public Boolean isOwner(User user,Task task){
-        return  task.getTaskOwner().equals(user);
+    public Boolean isOwner(User user, Task task) {
+        return task.getTaskOwner().equals(user);
     }
 
-    public Task createTask(Task task){
+    public Task createTask(Task task) {
 
         return taskRepository.save(task);
     }
 
-    public Task createTask(User user,Task task){
+    public Task createTask(User user, Task task) {
 
         task.setTaskOwner(user);
 
+        task.setTaskState(TaskState.EDITABLE);
+
         return taskRepository.save(task);
     }
 
-    public List<Task> getUserTasks(User user){
+    public List<Task> getUserTasks(User user) {
         return taskRepository.findAll().stream()
-                .filter(task -> task.getAssignees().contains(user)  || task.getTaskOwner().equals(user))
+                .filter(task -> task.getAssignees().contains(user) || task.getTaskOwner().equals(user))
                 .collect(Collectors.toList());
     }
 
     public Task updateTask(Long id, Task task) {
         task.setId(id);
         return taskRepository.save(task);
+    }
+
+    public Task pushTaskState(Task task) {
+
+        task.setTaskState(TaskState.next(task.getTaskState()));
+
+        taskRepository.save(task);
+
+        return task;
     }
 
 

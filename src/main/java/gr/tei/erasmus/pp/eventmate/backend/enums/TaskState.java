@@ -14,6 +14,23 @@ public enum TaskState {
     private Blob icon;
 
 
+    public static TaskState next(TaskState taskState) {
+
+        switch (taskState) {
+            case EDITABLE:
+                return READY_TO_START;
+            case READY_TO_START:
+                return IN_PLAY;
+            case IN_PLAY:
+                return IN_REVIEW;
+            case IN_REVIEW:
+                return FINISHED;
+            case FINISHED:
+                return FINISHED;
+        }
+        return null;
+    }
+
 
 
 }

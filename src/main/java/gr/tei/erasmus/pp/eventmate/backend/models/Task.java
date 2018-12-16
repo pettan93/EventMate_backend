@@ -1,5 +1,7 @@
 package gr.tei.erasmus.pp.eventmate.backend.models;
 
+import gr.tei.erasmus.pp.eventmate.backend.enums.TaskState;
+
 import javax.persistence.*;
 import java.sql.Blob;
 import java.util.ArrayList;
@@ -26,6 +28,14 @@ public class Task {
 
     private Long points;
 
+    private TaskState taskState;
+
+    private Boolean timeLimited;
+
+    private Integer remainingTime;
+
+    private Integer timeLimit;
+
     @OneToMany(cascade = CascadeType.ALL)
     private List<Submission> submissions;
 
@@ -44,6 +54,38 @@ public class Task {
         this.description = description;
         this.points = points;
         this.submissions = submissions;
+    }
+
+    public Integer getTimeLimit() {
+        return timeLimit;
+    }
+
+    public void setTimeLimit(Integer timeLimit) {
+        this.timeLimit = timeLimit;
+    }
+
+    public TaskState getTaskState() {
+        return taskState;
+    }
+
+    public void setTaskState(TaskState taskState) {
+        this.taskState = taskState;
+    }
+
+    public Boolean getTimeLimited() {
+        return timeLimited;
+    }
+
+    public void setTimeLimited(Boolean timeLimited) {
+        this.timeLimited = timeLimited;
+    }
+
+    public Integer getRemainingTime() {
+        return remainingTime;
+    }
+
+    public void setRemainingTime(Integer remainingTime) {
+        this.remainingTime = remainingTime;
     }
 
     public Long getId() {
