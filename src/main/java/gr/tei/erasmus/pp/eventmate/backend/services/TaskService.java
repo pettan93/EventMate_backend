@@ -1,37 +1,51 @@
 package gr.tei.erasmus.pp.eventmate.backend.services;
 
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.TaskDTO;
-import gr.tei.erasmus.pp.eventmate.backend.enums.UserRole;
-import gr.tei.erasmus.pp.eventmate.backend.models.Permission;
 import gr.tei.erasmus.pp.eventmate.backend.models.Task;
 import gr.tei.erasmus.pp.eventmate.backend.models.User;
 import gr.tei.erasmus.pp.eventmate.backend.repository.TaskRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class TaskService {
 
-    private final TaskRepository taskRepository;
+    @Autowired
+    private TaskRepository taskRepository;
+    @Autowired
+    private ModelMapper modelMapper;
+    @Autowired
+    private UserService userService;
 
-    private final ModelMapper modelMapper;
+    public Boolean hasPermission(User user, Task task){
+        return task.getAssignees().contains(user) || task.getTaskOwner().equals(user);
+    }
 
-    private final UserService userService;
-
-    public TaskService(TaskRepository taskRepository,
-                       ModelMapper modelMapper,
-                       UserService userService) {
-        this.taskRepository = taskRepository;
-        this.modelMapper = modelMapper;
-        this.userService = userService;
+    public Boolean isOwner(User user,Task task){
+        return  task.getTaskOwner().equals(user);
     }
 
     public Task createTask(Task task){
 
         return taskRepository.save(task);
+    }
+
+    public Task createTask(User user,Task task){
+
+        task.setTaskOwner(user);
+
+        return taskRepository.save(task);
+    }
+
+    public List<Task> getUserTasks(User user){
+        return taskRepository.findAll().stream()
+                .filter(task -> task.getAssignees().contains(user)  || task.getTaskOwner().equals(user))
+                .collect(Collectors.toList());
     }
 
     public Task updateTask(Long id, Task task) {
@@ -45,30 +59,34 @@ public class TaskService {
         TaskDTO taskDto = modelMapper.map(task, TaskDTO.class);
         taskDto.setSubmissionsCount(task.getSubmissions() != null ? task.getSubmissions().size() : 0);
 
-        User taskOwner =
-                userService.getUserById(task.getPermissions()
-                        .stream()
-                        .filter(permission -> permission.getUserRole().equals(UserRole.TASK_OWNER))
-                        .collect(Collectors.toList()).get(0).getUserId());
-
-        List<User> taskAsignees = userService.getUsersById(task.getPermissions()
+        taskDto.setAssignees(task.getAssignees() != null ? task.getAssignees()
                 .stream()
-                .filter(permission -> permission.getUserRole().equals(UserRole.TASK_ASSIGNEE))
-                .map(Permission::getUserId)
-                .collect(Collectors.toList()));
+                .map(assignee -> userService.convertToDto(assignee))
+                .collect(Collectors.toList()) : null);
 
-        taskDto.setTaskOwner(userService.convertToDto(taskOwner));
-        taskDto.setAssignees(taskAsignees
-                .stream()
-                .map(userService::convertToDto)
-                .collect(Collectors.toList()));
+        taskDto.setTaskOwner(userService.convertToDto(task.getTaskOwner()));
 
         return taskDto;
     }
 
 
-    private Task convertToEntity(TaskDTO task) {
+    public Task convertToEntity(TaskDTO taskDto) {
 
-        return null;
+        Task task = modelMapper.map(taskDto, Task.class);
+
+        if (taskDto.getId() != null) {
+            Optional<Task> oldTask = taskRepository.findById(taskDto.getId());
+            if (oldTask.isPresent()) {
+                // if exists in db
+                Task existingTask = oldTask.get();
+
+                task.setTaskOwner(existingTask.getTaskOwner());
+                task.setSubmissions(existingTask.getSubmissions());
+
+
+            }
+        }
+
+        return task;
     }
 }

@@ -26,11 +26,16 @@ public class TaskDTO {
 
     private Blob photo;
 
+    /************/
+
     private Integer submissionsCount;
 
     private UserDTO taskOwner;
 
     private List<UserDTO> assignees;
+
+    /************/
+
 
     public Long getId() {
         return id;

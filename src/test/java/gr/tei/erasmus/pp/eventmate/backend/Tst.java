@@ -1,9 +1,7 @@
 package gr.tei.erasmus.pp.eventmate.backend;
 
-import gr.tei.erasmus.pp.eventmate.backend.enums.UserRole;
-import org.junit.Test;
 
-import java.util.Arrays;
+import org.junit.Test;
 
 public class Tst {
 
@@ -18,7 +16,7 @@ public class Tst {
 //        System.out.println(ids);
 
 
-        System.out.println(Arrays.toString(UserRole.values()));
+
 
 
     }

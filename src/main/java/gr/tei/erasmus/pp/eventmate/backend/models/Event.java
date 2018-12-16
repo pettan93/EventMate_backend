@@ -6,7 +6,6 @@ import javax.persistence.*;
 import java.sql.Blob;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 public class Event {
@@ -30,8 +29,11 @@ public class Event {
     @OneToMany(cascade = CascadeType.ALL)
     private List<Report> reports;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<Permission> permissions;
+    @OneToOne
+    private User eventOwner;
+
+    @ManyToMany
+    private List<User> guests;
 
 
     @OneToMany(cascade = CascadeType.ALL)
@@ -52,13 +54,6 @@ public class Event {
         this.reports = reports;
     }
 
-    public Blob getPhoto() {
-        return photo;
-    }
-
-    public void setPhoto(Blob photo) {
-        this.photo = photo;
-    }
 
     public Long getId() {
         return id;
@@ -116,12 +111,20 @@ public class Event {
         this.reports = reports;
     }
 
-    public List<Permission> getPermissions() {
-        return permissions;
+    public User getEventOwner() {
+        return eventOwner;
     }
 
-    public void setPermissions(List<Permission> permissions) {
-        this.permissions = permissions;
+    public void setEventOwner(User eventOwner) {
+        this.eventOwner = eventOwner;
+    }
+
+    public List<User> getGuests() {
+        return guests;
+    }
+
+    public void setGuests(List<User> guests) {
+        this.guests = guests;
     }
 
     public List<Invitation> getInvitations() {
@@ -132,6 +135,15 @@ public class Event {
         this.invitations = invitations;
     }
 
+    public Blob getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(Blob photo) {
+        this.photo = photo;
+    }
+
+
     @Override
     public String toString() {
         return "Event{" +
@@ -139,27 +151,13 @@ public class Event {
                 ", name='" + name + '\'' +
                 ", date=" + date +
                 ", place='" + place + '\'' +
+                ", tasks=" + tasks +
                 ", state=" + state +
+                ", reports=" + reports +
+                ", eventOwner=" + eventOwner +
+                ", guests=" + guests +
+                ", invitations=" + invitations +
+                ", photo=" + photo +
                 '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Event event = (Event) o;
-        return Objects.equals(id, event.id) &&
-                Objects.equals(name, event.name) &&
-                Objects.equals(date, event.date) &&
-                Objects.equals(place, event.place) &&
-                Objects.equals(tasks, event.tasks) &&
-                state == event.state &&
-                Objects.equals(reports, event.reports) &&
-                Objects.equals(permissions, event.permissions);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, date, place, tasks, state, reports, permissions);
     }
 }

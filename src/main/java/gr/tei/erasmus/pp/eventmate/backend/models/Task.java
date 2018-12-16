@@ -14,8 +14,11 @@ public class Task {
 
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<Permission> permissions;
+    @OneToOne
+    private User taskOwner;
+
+    @ManyToMany
+    private List<User> assignees;
 
     private String place;
 
@@ -59,12 +62,20 @@ public class Task {
         this.name = name;
     }
 
-    public List<Permission> getPermissions() {
-        return permissions;
+    public User getTaskOwner() {
+        return taskOwner;
     }
 
-    public void setPermissions(ArrayList<Permission> permissions) {
-        this.permissions = permissions;
+    public void setTaskOwner(User taskOwner) {
+        this.taskOwner = taskOwner;
+    }
+
+    public List<User> getAssignees() {
+        return assignees;
+    }
+
+    public void setAssignees(List<User> assignees) {
+        this.assignees = assignees;
     }
 
     public String getPlace() {
@@ -95,7 +106,16 @@ public class Task {
         return submissions;
     }
 
-    public void setSubmissions(ArrayList<Submission> submissions) {
+    public void setSubmissions(List<Submission> submissions) {
         this.submissions = submissions;
     }
+
+    public Blob getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(Blob photo) {
+        this.photo = photo;
+    }
 }
+

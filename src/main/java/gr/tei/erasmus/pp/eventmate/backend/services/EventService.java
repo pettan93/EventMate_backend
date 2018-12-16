@@ -1,9 +1,11 @@
 package gr.tei.erasmus.pp.eventmate.backend.services;
 
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.EventDTO;
-import gr.tei.erasmus.pp.eventmate.backend.DTOs.UserDTO;
-import gr.tei.erasmus.pp.eventmate.backend.enums.UserRole;
-import gr.tei.erasmus.pp.eventmate.backend.models.*;
+import gr.tei.erasmus.pp.eventmate.backend.enums.EventState;
+import gr.tei.erasmus.pp.eventmate.backend.models.Event;
+import gr.tei.erasmus.pp.eventmate.backend.models.Invitation;
+import gr.tei.erasmus.pp.eventmate.backend.models.Task;
+import gr.tei.erasmus.pp.eventmate.backend.models.User;
 import gr.tei.erasmus.pp.eventmate.backend.repository.EventRepository;
 import gr.tei.erasmus.pp.eventmate.backend.repository.TaskRepository;
 import org.modelmapper.ModelMapper;
@@ -18,34 +20,60 @@ import java.util.stream.Collectors;
 @Service
 public class EventService {
 
-    private final EventRepository eventRepository;
-    private final TaskRepository taskRepository;
-
-    private final ModelMapper modelMapper;
-
-    private final UserService userService;
-
-    private final PermissionService permissionService;
-
-    private final TaskService taskService;
-
     @Autowired
-    public EventService(EventRepository eventRepository,
-                        TaskRepository taskRepository,
-                        ModelMapper modelMapper,
-                        UserService userService,
-                        PermissionService permissionService, TaskService taskService) {
-        this.eventRepository = eventRepository;
-        this.taskRepository = taskRepository;
-        this.modelMapper = modelMapper;
-        this.userService = userService;
-        this.permissionService = permissionService;
-        this.taskService = taskService;
+    private EventRepository eventRepository;
+    @Autowired
+    private TaskRepository taskRepository;
+    @Autowired
+    private ModelMapper modelMapper;
+    @Autowired
+    private TaskService taskService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private InvitationService invitationService;
+
+
+    public Boolean hasPermission(User user, Event event) {
+        return event.getGuests().contains(user) || event.getEventOwner().equals(user);
+    }
+
+    public Boolean isOwner(User user, Event event) {
+        return event.getEventOwner().equals(user);
+    }
+
+
+    public Event asignOwner(User user, Event event) {
+
+        event.setEventOwner(user);
+
+        return eventRepository.save(event);
     }
 
     public Event createEvent(Event event) {
 
+        event.setState(EventState.EDITABLE);
+
         return eventRepository.save(event);
+    }
+
+    public Event createEvent(User user, Event event) {
+
+        event.setState(EventState.EDITABLE);
+
+        event.setEventOwner(user);
+
+        return eventRepository.save(event);
+    }
+
+
+    public List<Event> getUserEvents(User user) {
+        return eventRepository.findAll()
+                .stream()
+                .filter(event ->
+                        (event.getGuests() != null && event.getGuests().contains(user)) ||
+                                (event.getEventOwner() != null && event.getEventOwner().equals(user)))
+                .collect(Collectors.toList());
     }
 
     public Event updateEvent(Long id, Event event) {
@@ -86,11 +114,25 @@ public class EventService {
         for (Invitation invitation : invitations) {
 
             //TODO fire invitation
-            event.getInvitations().add(invitation);
-
+            if (!alreadyInvited(event, invitation)) {
+                event.getInvitations().add(invitation);
+            }
         }
 
         return eventRepository.save(event);
+    }
+
+
+    public Boolean alreadyInvited(Event event, Invitation invitation) {
+
+        return !event.getInvitations()
+                .stream()
+                .filter(existingInv ->
+                        existingInv.getEmail() != null && invitation.getEmail() != null &&
+                                existingInv.getEmail().strip().equalsIgnoreCase(invitation.getEmail().strip()) ||
+                        existingInv.getUser() != null && invitation.getUser() != null &&
+                                invitation.getUser().equals(existingInv.getUser()))
+                .collect(Collectors.toList()).isEmpty();
     }
 
     public Event getParentEvent(Task task) {
@@ -107,38 +149,30 @@ public class EventService {
         EventDTO eventDto = modelMapper.map(event, EventDTO.class);
         eventDto.setTaskCount(event.getTasks() != null ? event.getTasks().size() : 0);
         eventDto.setReportsCount(event.getReports() != null ? event.getReports().size() : 0);
+        eventDto.setUsersCount(event.getGuests() != null ? event.getReports().size() + 1 : 0);
 
-        User eventOwner =
-                userService.getUserById(event.getPermissions()
-                        .stream()
-                        .filter(permission -> permission.getUserRole().equals(UserRole.EVENT_OWNER))
-                        .collect(Collectors.toList()).get(0).getUserId());
 
-        List<User> eventGuests = userService.getUsersById(event.getPermissions()
+        eventDto.setEventOwner(userService.convertToDto(event.getEventOwner()));
+        eventDto.setGuests(event.getGuests() != null ? event.getGuests()
                 .stream()
-                .filter(permission -> permission.getUserRole().equals(UserRole.EVENT_GUEST))
-                .map(Permission::getUserId)
-                .collect(Collectors.toList()));
+                .map(guest -> userService.convertToDto(guest))
+                .collect(Collectors.toList()) : null);
 
-
-        eventDto.setUsersCount(event.getPermissions().size());
-        eventDto.setEventOwner(userService.convertToDto(eventOwner));
-        eventDto.setGuests(eventGuests
+        eventDto.setTasks(event.getTasks() != null ? event.getTasks()
                 .stream()
-                .map(userService::convertToDto)
-                .collect(Collectors.toList()));
+                .map(task -> taskService.convertToDto(task))
+                .collect(Collectors.toList()) : null);
 
-        eventDto.setTasks(event.getTasks()
+        eventDto.setInvitations(event.getInvitations() != null ? event.getInvitations()
                 .stream()
-                .map(taskService::convertToDto)
-                .collect(Collectors.toList()));
+                .map(invitation -> invitationService.convertToDto(invitation))
+                .collect(Collectors.toList()) : null);
 
         return eventDto;
     }
 
-    private Event convertToEntity(EventDTO eventDTO) {
+    public Event convertToEntity(EventDTO eventDTO) {
 
-        // nema permission
         Event event = modelMapper.map(eventDTO, Event.class);
 
 
@@ -148,30 +182,14 @@ public class EventService {
                 // if exists in db
                 Event existingEvent = oldEvent.get();
 
-                for (UserDTO guest : eventDTO.getGuests()) {
-                    User user = userService.convertToEntity(guest);
-                    if (!permissionService.hasPermission(user, existingEvent)) {
-                        event.getPermissions().add(
-                                new Permission(
-                                        user.getId(),
-                                        null,
-                                        existingEvent.getId(),
-                                        UserRole.EVENT_GUEST));
-                    }
-                }
+                event.setEventOwner(existingEvent.getEventOwner());
+                event.setGuests(existingEvent.getGuests());
+                event.setInvitations(existingEvent.getInvitations());
+                event.setReports(existingEvent.getReports());
+                event.setTasks(existingEvent.getTasks());
 
-                User owner = userService.convertToEntity(eventDTO.getEventOwner());
-                if (!permissionService.hasPermissionRole(owner, existingEvent, UserRole.EVENT_OWNER)) {
-                    event.getPermissions().add(
-                            new Permission(
-                                    owner.getId(),
-                                    null,
-                                    existingEvent.getId(),
-                                    UserRole.EVENT_OWNER));
-                }
             }
         }
-
 
 
         return event;

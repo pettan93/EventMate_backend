@@ -1,7 +1,7 @@
 package gr.tei.erasmus.pp.eventmate.backend;
 
 import gr.tei.erasmus.pp.eventmate.backend.repository.EventRepository;
-import gr.tei.erasmus.pp.eventmate.backend.repository.PermissionRepository;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +12,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest
 public class BackendApplicationTests {
 
-    @Autowired
-    PermissionRepository permissionRepository;
 
     @Autowired
     EventRepository eventRepository;

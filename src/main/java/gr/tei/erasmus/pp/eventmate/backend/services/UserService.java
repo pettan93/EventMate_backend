@@ -1,8 +1,7 @@
 package gr.tei.erasmus.pp.eventmate.backend.services;
 
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.UserDTO;
-import gr.tei.erasmus.pp.eventmate.backend.models.Event;
-import gr.tei.erasmus.pp.eventmate.backend.models.Task;
+import gr.tei.erasmus.pp.eventmate.backend.DTOs.UserPublicDTO;
 import gr.tei.erasmus.pp.eventmate.backend.models.User;
 import gr.tei.erasmus.pp.eventmate.backend.repository.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -18,19 +17,24 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final PermissionService permissionService;
     private final ModelMapper modelMapper;
+    private final EventService eventService;
+    private final TaskService taskService;
 
     @Autowired
     public UserService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
-                       PermissionService permissionService,
-                       ModelMapper modelMapper) {
+                       ModelMapper modelMapper,
+                       EventService eventService,
+                       TaskService taskService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.permissionService = permissionService;
         this.modelMapper = modelMapper;
+        this.eventService = eventService;
+        this.taskService = taskService;
     }
+
+
 
     public User register(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -50,6 +54,10 @@ public class UserService {
 
     }
 
+    public List<User> getUsers() {
+        return userRepository.findAll();
+    }
+
     public List<User> getUsersById(List<Long> ids) {
         return userRepository.findAllById(ids);
     }
@@ -59,13 +67,11 @@ public class UserService {
 
         UserDTO userDto = modelMapper.map(user, UserDTO.class);
 
+        var userEvents = eventService.getUserEvents(user);
+        var userTasks = taskService.getUserTasks(user);
 
-        Optional<List> userEvents = permissionService.getModels(Event.class, user);
-        Optional<List> userTasks = permissionService.getModels(Task.class, user);
-
-        userDto.setEventCount(userEvents.map(List::size).orElse(0));
-        userDto.setTaskCount(userTasks.map(List::size).orElse(0));
-
+        userDto.setEventCount(userEvents != null ? userEvents.size() : 0);
+        userDto.setTaskCount(userTasks != null ? userTasks.size() : 0);
 
         return userDto;
 
@@ -73,8 +79,16 @@ public class UserService {
 
     public User convertToEntity(UserDTO userDTO) {
 
-        return null;
+        User user = modelMapper.map(userDTO, User.class);
+
+        return user;
     }
+
+    public UserPublicDTO convertToPublicDto(User user) {
+
+        return modelMapper.map(user, UserPublicDTO.class);
+    }
+
 
 
 }

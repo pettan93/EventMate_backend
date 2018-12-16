@@ -1,13 +1,13 @@
 package gr.tei.erasmus.pp.eventmate.backend;
 
 import gr.tei.erasmus.pp.eventmate.backend.enums.EventState;
-import gr.tei.erasmus.pp.eventmate.backend.enums.UserRole;
+import gr.tei.erasmus.pp.eventmate.backend.enums.InvitationState;
+import gr.tei.erasmus.pp.eventmate.backend.enums.InvitationType;
 import gr.tei.erasmus.pp.eventmate.backend.models.Event;
-import gr.tei.erasmus.pp.eventmate.backend.models.Permission;
+import gr.tei.erasmus.pp.eventmate.backend.models.Invitation;
 import gr.tei.erasmus.pp.eventmate.backend.models.Task;
 import gr.tei.erasmus.pp.eventmate.backend.models.User;
 import gr.tei.erasmus.pp.eventmate.backend.repository.EventRepository;
-import gr.tei.erasmus.pp.eventmate.backend.repository.PermissionRepository;
 import gr.tei.erasmus.pp.eventmate.backend.repository.TaskRepository;
 import gr.tei.erasmus.pp.eventmate.backend.services.EventService;
 import gr.tei.erasmus.pp.eventmate.backend.services.UserService;
@@ -22,7 +22,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 @Component
 public class StartupBean {
@@ -38,8 +37,6 @@ public class StartupBean {
     private final EventService eventService;
 
 
-    private final PermissionRepository permissionRepository;
-
     private final UserService userService;
 
     @Autowired
@@ -47,13 +44,13 @@ public class StartupBean {
 
 
     @Autowired
-    public StartupBean(TaskRepository taskRepository, EventRepository eventRepository,
+    public StartupBean(TaskRepository taskRepository,
+                       EventRepository eventRepository,
                        EventService eventService,
-                       PermissionRepository permissionRepository, UserService userService) {
+                       UserService userService) {
         this.taskRepository = taskRepository;
         this.eventRepository = eventRepository;
         this.eventService = eventService;
-        this.permissionRepository = permissionRepository;
         this.userService = userService;
     }
 
@@ -88,6 +85,13 @@ public class StartupBean {
                 EventState.READY_TO_PLAY,
                 new ArrayList<>());
 
+        event1.setEventOwner(user1);
+        event1.setGuests(Arrays.asList(user2,user3));
+
+        Invitation userInvitation = new Invitation(user4,null, InvitationType.NOTIFICATION, InvitationState.PENDING);
+        Invitation emailInvitation = new Invitation(null,"neregistrovany@user.cz", InvitationType.EMAIL, InvitationState.PENDING);
+
+        event1.setInvitations(Arrays.asList(userInvitation,emailInvitation));
 
         Task task1 = new Task(
                 "Rakia shots",
@@ -98,25 +102,11 @@ public class StartupBean {
         );
 
 
+        task1.setTaskOwner(user1);
+        task1.setAssignees(Arrays.asList(user2,user3));
+
         event1.getTasks().add(task1);
 
-        eventRepository.save(event1);
-
-
-        // event permissions
-        Permission ownerPermission = new Permission(user1.getId(), null, event1.getId(), UserRole.EVENT_OWNER);
-        Permission guestPermission1 = new Permission(user2.getId(), null, event1.getId(), UserRole.EVENT_GUEST);
-        Permission guestPermission2 = new Permission(user3.getId(), null, event1.getId(), UserRole.EVENT_GUEST);
-        Permission guestPermission3 = new Permission(user4.getId(), null, event1.getId(), UserRole.EVENT_GUEST);
-        List<Permission> eventPermissions = Arrays.asList(ownerPermission, guestPermission1, guestPermission2, guestPermission3);
-        event1.setPermissions(new ArrayList<>(eventPermissions));
-
-        // tasks permissions
-        Permission taskOwnerPermission = new Permission(user1.getId(), task1.getId(), null, UserRole.TASK_OWNER);
-        Permission asigneePermission1 = new Permission(user2.getId(), task1.getId(), null, UserRole.TASK_ASSIGNEE);
-        Permission asigneePermission2 = new Permission(user3.getId(), task1.getId(), null, UserRole.TASK_ASSIGNEE);
-        List<Permission> task1Permissions = Arrays.asList(taskOwnerPermission, asigneePermission1, asigneePermission2);
-        task1.setPermissions(new ArrayList<>(task1Permissions));
 
         eventRepository.save(event1);
 

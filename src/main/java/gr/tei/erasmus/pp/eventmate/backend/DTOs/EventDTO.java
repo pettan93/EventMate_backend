@@ -1,7 +1,7 @@
 package gr.tei.erasmus.pp.eventmate.backend.DTOs;
 
 import gr.tei.erasmus.pp.eventmate.backend.enums.EventState;
-import gr.tei.erasmus.pp.eventmate.backend.models.*;
+import gr.tei.erasmus.pp.eventmate.backend.models.Report;
 
 import java.sql.Blob;
 import java.util.Date;
@@ -23,7 +23,7 @@ public class EventDTO {
 
     private List<Report> reports;
 
-    private List<Invitation> invitations;
+    private List<InvitationDTO> invitations;
 
     private Blob photo;
 
@@ -38,6 +38,8 @@ public class EventDTO {
     private UserDTO eventOwner;
 
     private List<UserDTO> guests;
+
+    /*******************/
 
     public UserDTO getEventOwner() {
         return eventOwner;
@@ -144,11 +146,31 @@ public class EventDTO {
     }
 
 
-    public List<Invitation> getInvitations() {
+    public List<InvitationDTO> getInvitations() {
         return invitations;
     }
 
-    public void setInvitations(List<Invitation> invitations) {
+    public void setInvitations(List<InvitationDTO> invitations) {
         this.invitations = invitations;
+    }
+
+    @Override
+    public String toString() {
+        return "EventDTO{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", date=" + date +
+                ", place='" + place + '\'' +
+                ", tasks=" + tasks +
+                ", state=" + state +
+                ", reports=" + reports +
+                ", invitations=" + invitations +
+                ", photo=" + photo +
+                ", taskCount=" + taskCount +
+                ", reportsCount=" + reportsCount +
+                ", usersCount=" + usersCount +
+                ", eventOwner=" + eventOwner +
+                ", guests=" + guests +
+                '}';
     }
 }
