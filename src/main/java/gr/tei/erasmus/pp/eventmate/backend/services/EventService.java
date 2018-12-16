@@ -163,7 +163,8 @@ public class EventService {
         EventDTO eventDto = modelMapper.map(event, EventDTO.class);
         eventDto.setTaskCount(event.getTasks() != null ? event.getTasks().size() : 0);
         eventDto.setReportsCount(event.getReports() != null ? event.getReports().size() : 0);
-        eventDto.setUsersCount(event.getGuests() != null ? event.getReports().size() + 1 : 0);
+        eventDto.setUsersCount(event.getGuests() != null ? event.getGuests().size() + 1 : 0);
+        eventDto.setInvitationsCount(event.getInvitations() != null ? event.getInvitations().size() : 0);
 
 
         eventDto.setEventOwner(userService.convertToDto(event.getEventOwner()));

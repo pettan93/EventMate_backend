@@ -31,6 +31,8 @@ public class EventDTO {
 
     private Integer taskCount;
 
+    private Integer invitationsCount;
+
     private Integer reportsCount;
 
     private Integer usersCount;
@@ -39,7 +41,17 @@ public class EventDTO {
 
     private List<UserDTO> guests;
 
+    public Integer getInvitationsCount() {
+        return invitationsCount;
+    }
+
+    public void setInvitationsCount(Integer invitationsCount) {
+        this.invitationsCount = invitationsCount;
+    }
+
     /*******************/
+
+
 
     public UserDTO getEventOwner() {
         return eventOwner;
