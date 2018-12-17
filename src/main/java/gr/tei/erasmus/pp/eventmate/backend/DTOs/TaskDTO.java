@@ -39,12 +39,22 @@ public class TaskDTO {
 
     private Integer submissionsCount;
 
+    private Long eventId;
+
     private UserDTO taskOwner;
 
     private List<UserDTO> assignees;
 
     public TaskState getTaskState() {
         return taskState;
+    }
+
+    public Long getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
     }
 
     public void setTaskState(TaskState taskState) {

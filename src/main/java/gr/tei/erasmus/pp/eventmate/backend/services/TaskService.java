@@ -22,6 +22,8 @@ public class TaskService {
     private ModelMapper modelMapper;
     @Autowired
     private UserService userService;
+    @Autowired
+    private EventService eventService;
 
     public Boolean hasPermission(User user, Task task) {
         return task.getAssignees().contains(user) || task.getTaskOwner().equals(user);
@@ -81,6 +83,8 @@ public class TaskService {
                 .collect(Collectors.toList()) : null);
 
         taskDto.setTaskOwner(userService.convertToDto(task.getTaskOwner()));
+
+        taskDto.setEventId(eventService.getParentEvent(task).getId());
 
         return taskDto;
     }
