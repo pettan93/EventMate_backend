@@ -86,6 +86,7 @@ public class EventResource {
         if (!eventService.hasPermission(user, event.get()))
             return ResponseEntity.status(403).build();
 
+
         eventService.deleteEvent(event.get());
 
         return ResponseEntity.ok().build();

@@ -71,6 +71,9 @@ public class TaskResource {
 
         System.out.println("delete task");
 
+        eventService.getParentEvent(taskOptional.get()).getTasks().remove(taskOptional.get());
+
+
         taskService.deleteTask(taskOptional.get());
 
         return ResponseEntity.ok().build();
