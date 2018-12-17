@@ -21,15 +21,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/public/**").permitAll()
-                .antMatchers("/**").authenticated()
-                .anyRequest()
-                .authenticated()
+                .antMatchers("/event", "/event/**", "/task", "/task/**", "/me", "/me/**").authenticated()
                 .and()
                 .httpBasic()
                 .and()
                 .csrf().disable()
                 .headers().frameOptions().disable()
+
+
         ;
     }
 

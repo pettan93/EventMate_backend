@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -67,11 +68,15 @@ public class UserService {
 
         UserDTO userDto = modelMapper.map(user, UserDTO.class);
 
-        var userEvents = eventService.getUserEvents(user);
-        var userTasks = taskService.getUserTasks(user);
 
-        userDto.setEventCount(userEvents != null ? userEvents.size() : 0);
-        userDto.setTaskCount(userTasks != null ? userTasks.size() : 0);
+        var userEvents = eventService.getUserEvents(user);
+        var oragnizedEvents = userEvents
+                .stream()
+                .filter(event -> event.getEventOwner() != null && event.getEventOwner().equals(user))
+                .collect(Collectors.toList());
+
+        userDto.setAttendedEvents(userEvents.size());
+        userDto.setOrganizedEvents(oragnizedEvents.size());
 
         return userDto;
 

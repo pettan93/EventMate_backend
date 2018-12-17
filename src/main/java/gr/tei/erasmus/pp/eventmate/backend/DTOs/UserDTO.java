@@ -14,9 +14,9 @@ public class UserDTO {
 
     private Integer score;
 
-    private Integer eventCount;
+    private Integer organizedEvents;
 
-    private Integer taskCount;
+    private Integer attendedEvents;
 
 
 
@@ -60,19 +60,19 @@ public class UserDTO {
         this.score = score;
     }
 
-    public Integer getEventCount() {
-        return eventCount;
+    public Integer getOrganizedEvents() {
+        return organizedEvents;
     }
 
-    public void setEventCount(Integer eventCount) {
-        this.eventCount = eventCount;
+    public void setOrganizedEvents(Integer organizedEvents) {
+        this.organizedEvents = organizedEvents;
     }
 
-    public Integer getTaskCount() {
-        return taskCount;
+    public Integer getAttendedEvents() {
+        return attendedEvents;
     }
 
-    public void setTaskCount(Integer taskCount) {
-        this.taskCount = taskCount;
+    public void setAttendedEvents(Integer attendedEvents) {
+        this.attendedEvents = attendedEvents;
     }
 }
