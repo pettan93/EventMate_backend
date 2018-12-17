@@ -66,6 +66,9 @@ public class EventService {
         return eventRepository.save(event);
     }
 
+    public void deleteEvent(Event event){
+        eventRepository.delete(event);
+    }
 
     public List<Event> getUserEvents(User user) {
         return eventRepository.findAll()

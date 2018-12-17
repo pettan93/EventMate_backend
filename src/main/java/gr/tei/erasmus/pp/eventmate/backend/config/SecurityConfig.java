@@ -21,7 +21,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/event", "/event/**", "/task", "/task/**", "/me", "/me/**").authenticated()
+                .antMatchers(
+                        "/event",
+                        "/event/**",
+                        "/task",
+                        "/task/**",
+                        "/user",
+                        "/user/**",
+                        "/me",
+                        "/me/**").authenticated()
                 .and()
                 .httpBasic()
                 .and()

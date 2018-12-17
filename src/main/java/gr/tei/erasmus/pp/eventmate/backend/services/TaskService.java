@@ -45,6 +45,10 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
+    public void deleteTask(Task task){
+        taskRepository.delete(task);
+    }
+
     public List<Task> getUserTasks(User user) {
         return taskRepository.findAll().stream()
                 .filter(task -> task.getAssignees().contains(user) || task.getTaskOwner().equals(user))

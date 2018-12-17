@@ -57,9 +57,19 @@ public class UserResource {
 
 
     @GetMapping("/me")
-    public ResponseEntity<Object> getUserDetail() {
+    public ResponseEntity<Object> getMyDetail()  {
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+
+        return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body(userService.convertToDto(user));
+    }
+
+    @GetMapping("/user/{id}")
+    public ResponseEntity<Object> getUserDetail(@PathVariable long id) {
+
+        User user = userService.getUserById(id);
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)

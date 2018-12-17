@@ -69,6 +69,29 @@ public class EventResource {
         return ResponseEntity.status(HttpStatus.CREATED).body(eventService.convertToDto(savedEvent));
     }
 
+
+    /**
+     * Permission: EventOwner
+     */
+    @DeleteMapping("/event/{id}")
+    public ResponseEntity<Object> deleteEvent(@PathVariable long id) {
+
+        Optional<Event> event = eventRepository.findById(id);
+
+        if (event.isEmpty())
+            return ResponseEntity.notFound().build();
+
+        User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+
+        if (!eventService.hasPermission(user, event.get()))
+            return ResponseEntity.status(403).build();
+
+        eventService.deleteEvent(event.get());
+
+        return ResponseEntity.ok().build();
+    }
+
+
     /**
      * Permission: Everyone involved in event
      */

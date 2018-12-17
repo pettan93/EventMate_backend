@@ -54,6 +54,29 @@ public class TaskResource {
     }
 
     /**
+     * Permission: TaskOwner or EventOwner
+     */
+    @DeleteMapping("/task/{id}")
+    public ResponseEntity<Object> deleteTask(@PathVariable long id) {
+
+        Optional<Task> taskOptional = taskRepository.findById(id);
+
+        if (taskOptional.isEmpty())
+            return ResponseEntity.notFound().build();
+
+        User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+
+        if (!taskService.isOwner(user, taskOptional.get()) || !eventService.isOwner(user,eventService.getParentEvent(taskOptional.get())))
+            return ResponseEntity.status(403).build();
+
+        System.out.println("delete task");
+
+        taskService.deleteTask(taskOptional.get());
+
+        return ResponseEntity.ok().build();
+    }
+
+    /**
      * Permission: Parent event EventOnwer and TaskOwner
      */
     @PutMapping("/task/{id}")
@@ -68,7 +91,7 @@ public class TaskResource {
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
-        if (!taskService.isOwner(user, taskOptional.get()))
+        if (!taskService.isOwner(user, taskOptional.get()) || !eventService.isOwner(user,eventService.getParentEvent(taskOptional.get())))
             return ResponseEntity.status(403).build();
 
 
