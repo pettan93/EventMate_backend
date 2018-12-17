@@ -16,4 +16,11 @@
 - [ ] File management
 
 
+commands--
+package
+mvnw package -Dmaven.test.skip=true
+run
+java -jar target\backend-0.0.1-SNAPSHOT.jar
+
+
 
