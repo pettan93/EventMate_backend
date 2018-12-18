@@ -52,7 +52,6 @@ public class UserResource {
                         .stream()
                         .map(userService::convertToPublicDto)
                         .collect(Collectors.toList()));
-
     }
 
 

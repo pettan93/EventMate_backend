@@ -12,7 +12,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.sql.rowset.serial.SerialBlob;
+import java.sql.Blob;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -186,6 +189,18 @@ public class EventService {
                 .map(invitation -> invitationService.convertToDto(invitation))
                 .collect(Collectors.toList()) : null);
 
+        if(event.getPhoto() != null){
+            try {
+
+
+                eventDto.setPhoto(event.getPhoto().toString());
+
+
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+
         return eventDto;
     }
 
@@ -206,6 +221,19 @@ public class EventService {
                 event.setReports(existingEvent.getReports());
                 event.setTasks(existingEvent.getTasks());
 
+            }
+        }
+
+        if(eventDTO.getPhoto() != null){
+            try {
+
+                Blob photoBlob = new SerialBlob(eventDTO.getPhoto().getBytes());
+                event.setPhoto(photoBlob);
+
+
+
+            } catch (Exception e){
+                e.printStackTrace();
             }
         }
 

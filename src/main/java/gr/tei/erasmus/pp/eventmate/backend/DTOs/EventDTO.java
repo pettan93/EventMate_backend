@@ -25,8 +25,6 @@ public class EventDTO {
 
     private List<InvitationDTO> invitations;
 
-    private Blob photo;
-
     /************/
 
     private Integer taskCount;
@@ -40,6 +38,8 @@ public class EventDTO {
     private UserDTO eventOwner;
 
     private List<UserDTO> guests;
+
+    private String photo;
 
     public Integer getInvitationsCount() {
         return invitationsCount;
@@ -93,11 +93,11 @@ public class EventDTO {
         this.usersCount = usersCount;
     }
 
-    public Blob getPhoto() {
+    public String getPhoto() {
         return photo;
     }
 
-    public void setPhoto(Blob photo) {
+    public void setPhoto(String photo) {
         this.photo = photo;
     }
 
