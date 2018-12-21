@@ -34,10 +34,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .httpBasic()
                 .and()
                 .csrf().disable()
-                .headers().frameOptions().disable()
+                .headers().frameOptions().disable();
 
-
-        ;
     }
 
     @Override

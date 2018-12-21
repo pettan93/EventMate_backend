@@ -1,7 +1,7 @@
 package gr.tei.erasmus.pp.eventmate.backend.models;
 
 import javax.persistence.*;
-import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Submission {
@@ -10,17 +10,24 @@ public class Submission {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private ArrayList<File> content;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval=true)
+    private List<SubmissionFile> content;
 
     @ManyToOne
     private User submitter;
 
+
+    private Integer earnedPoints;
+
     public Submission() {
     }
 
-    public Submission(ArrayList<File> content, User submitter) {
-        this.content = content;
-        this.submitter = submitter;
+    public Integer getEarnedPoints() {
+        return earnedPoints;
+    }
+
+    public void setEarnedPoints(Integer earnedPoints) {
+        this.earnedPoints = earnedPoints;
     }
 
     public Long getId() {
@@ -31,11 +38,11 @@ public class Submission {
         this.id = id;
     }
 
-    public ArrayList<File> getContent() {
+    public List<SubmissionFile> getContent() {
         return content;
     }
 
-    public void setContent(ArrayList<File> content) {
+    public void setContent(List<SubmissionFile> content) {
         this.content = content;
     }
 
@@ -45,5 +52,15 @@ public class Submission {
 
     public void setSubmitter(User submitter) {
         this.submitter = submitter;
+    }
+
+    @Override
+    public String toString() {
+        return "Submission{" +
+                "id=" + id +
+                ", content=" + content +
+                ", submitter=" + submitter +
+                ", earnedPoints=" + earnedPoints +
+                '}';
     }
 }

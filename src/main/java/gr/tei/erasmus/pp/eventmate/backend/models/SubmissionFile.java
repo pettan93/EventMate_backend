@@ -10,7 +10,7 @@ import java.sql.Blob;
 import java.util.Date;
 
 @Entity
-public class File {
+public class SubmissionFile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -22,10 +22,10 @@ public class File {
 
     private Date created;
 
-    public File() {
+    public SubmissionFile() {
     }
 
-    public File(Blob content, FileType type, Date created) {
+    public SubmissionFile(Blob content, FileType type, Date created) {
         this.content = content;
         this.type = type;
         this.created = created;
@@ -61,5 +61,14 @@ public class File {
 
     public void setCreated(Date created) {
         this.created = created;
+    }
+
+    @Override
+    public String toString() {
+        return "SubmissionFile{" +
+                "id=" + id +
+                ", type=" + type +
+                ", created=" + created +
+                '}';
     }
 }

@@ -33,9 +33,22 @@ public class TaskService {
         return task.getTaskOwner().equals(user);
     }
 
+    public void saveTask(Task task){
+        taskRepository.save(task);
+    }
+
     public Task createTask(Task task) {
 
         return taskRepository.save(task);
+    }
+
+
+    public Boolean isTaskInSubmissionState(Task task){
+        return task.getTaskState().equals(TaskState.IN_PLAY);
+    }
+
+    public Boolean isUserAssignee(Task task, User user){
+        return task.getAssignees().contains(user);
     }
 
     public Task createTask(User user, Task task) {
@@ -69,6 +82,10 @@ public class TaskService {
         taskRepository.save(task);
 
         return task;
+    }
+
+    public List<Task> getAllTasks(){
+        return taskRepository.findAll();
     }
 
 

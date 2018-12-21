@@ -1,24 +1,20 @@
 package gr.tei.erasmus.pp.eventmate.backend;
 
-import gr.tei.erasmus.pp.eventmate.backend.enums.EventState;
-import gr.tei.erasmus.pp.eventmate.backend.enums.InvitationState;
-import gr.tei.erasmus.pp.eventmate.backend.enums.InvitationType;
-import gr.tei.erasmus.pp.eventmate.backend.enums.TaskState;
-import gr.tei.erasmus.pp.eventmate.backend.models.Event;
-import gr.tei.erasmus.pp.eventmate.backend.models.Invitation;
-import gr.tei.erasmus.pp.eventmate.backend.models.Task;
-import gr.tei.erasmus.pp.eventmate.backend.models.User;
+import gr.tei.erasmus.pp.eventmate.backend.enums.*;
+import gr.tei.erasmus.pp.eventmate.backend.models.*;
 import gr.tei.erasmus.pp.eventmate.backend.repository.EventRepository;
 import gr.tei.erasmus.pp.eventmate.backend.repository.TaskRepository;
 import gr.tei.erasmus.pp.eventmate.backend.services.EventService;
 import gr.tei.erasmus.pp.eventmate.backend.services.UserService;
 import gr.tei.erasmus.pp.eventmate.backend.utils.DateUtils;
+import gr.tei.erasmus.pp.eventmate.backend.utils.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -83,16 +79,16 @@ public class StartupBean {
                 date1,
                 "Pub 321",
                 new ArrayList<>(),
-                EventState.READY_TO_PLAY,
+                EventState.IN_PLAY,
                 new ArrayList<>());
 
         event1.setEventOwner(user1);
-        event1.setGuests(Arrays.asList(user2,user3));
+        event1.setGuests(Arrays.asList(user2, user3));
 
-        Invitation userInvitation = new Invitation(user4,null, InvitationType.NOTIFICATION, InvitationState.PENDING);
-        Invitation emailInvitation = new Invitation(null,"neregistrovany@user.cz", InvitationType.EMAIL, InvitationState.PENDING);
+        Invitation userInvitation = new Invitation(user4, null, InvitationType.NOTIFICATION, InvitationState.PENDING);
+        Invitation emailInvitation = new Invitation(null, "neregistrovany@user.cz", InvitationType.EMAIL, InvitationState.PENDING);
 
-        event1.setInvitations(Arrays.asList(userInvitation,emailInvitation));
+        event1.setInvitations(Arrays.asList(userInvitation, emailInvitation));
 
         Task task1 = new Task(
                 "Rakia shots",
@@ -102,10 +98,23 @@ public class StartupBean {
                 null
         );
 
-        task1.setTaskState(TaskState.EDITABLE);
+        task1.setTaskState(TaskState.IN_PLAY);
 
         task1.setTaskOwner(user1);
-        task1.setAssignees(Arrays.asList(user2,user3));
+        task1.setAssignees(Arrays.asList(user2, user3));
+
+
+        var sbf = new SubmissionFile();
+        sbf.setContent(FileUtils.getFileBlob(new File("joke.jpg")));
+        sbf.setType(FileType.PHOTO);
+        sbf.setCreated(new Date());
+
+        var submission1 = new Submission();
+        submission1.setSubmitter(user2);
+        submission1.setContent(Arrays.asList(sbf));
+
+
+        task1.setSubmissions(Arrays.asList(submission1));
 
         event1.getTasks().add(task1);
 

@@ -16,21 +16,12 @@ import java.util.stream.Collectors;
 @Service
 public class InvitationService {
 
-    private final UserRepository userRepository;
-
-    private final InvitationRepository invitationRepository;
-
-    private final ModelMapper modelMapper;
-
-
     @Autowired
-    public InvitationService(UserRepository userRepository,
-                             InvitationRepository invitationRepository,
-                             ModelMapper modelMapper) {
-        this.userRepository = userRepository;
-        this.invitationRepository = invitationRepository;
-        this.modelMapper = modelMapper;
-    }
+    private UserRepository userRepository;
+    @Autowired
+    private InvitationRepository invitationRepository;
+    @Autowired
+    private ModelMapper modelMapper;
 
 
     public List<Invitation> getUserInvitations(User user) {

@@ -36,7 +36,7 @@ public class Task {
 
     private Integer timeLimit;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval=true)
     private List<Submission> submissions;
 
     private Blob photo;

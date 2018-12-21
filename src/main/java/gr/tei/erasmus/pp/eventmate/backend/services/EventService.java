@@ -8,14 +8,12 @@ import gr.tei.erasmus.pp.eventmate.backend.models.Task;
 import gr.tei.erasmus.pp.eventmate.backend.models.User;
 import gr.tei.erasmus.pp.eventmate.backend.repository.EventRepository;
 import gr.tei.erasmus.pp.eventmate.backend.repository.TaskRepository;
+import gr.tei.erasmus.pp.eventmate.backend.utils.FileUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.sql.rowset.serial.SerialBlob;
-import java.sql.Blob;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -38,6 +36,7 @@ public class EventService {
 
 
     public Boolean hasPermission(User user, Event event) {
+//        System.out.println("has permission user " + user + " na " + event);
         return event.getGuests().contains(user) || event.getEventOwner().equals(user);
     }
 
@@ -69,7 +68,7 @@ public class EventService {
         return eventRepository.save(event);
     }
 
-    public void deleteEvent(Event event){
+    public void deleteEvent(Event event) {
         eventRepository.delete(event);
     }
 
@@ -128,7 +127,7 @@ public class EventService {
         return eventRepository.save(event);
     }
 
-    public Event pushEventState(Event event){
+    public Event pushEventState(Event event) {
 
         event.setState(EventState.next(event.getState()));
 
@@ -138,7 +137,7 @@ public class EventService {
     }
 
 
-    public Boolean isEditable(Event event){
+    public Boolean isEditable(Event event) {
         return event.getState().equals(EventState.EDITABLE);
     }
 
@@ -150,8 +149,8 @@ public class EventService {
                 .filter(existingInv ->
                         existingInv.getEmail() != null && invitation.getEmail() != null &&
                                 existingInv.getEmail().strip().equalsIgnoreCase(invitation.getEmail().strip()) ||
-                        existingInv.getUser() != null && invitation.getUser() != null &&
-                                invitation.getUser().equals(existingInv.getUser()))
+                                existingInv.getUser() != null && invitation.getUser() != null &&
+                                        invitation.getUser().equals(existingInv.getUser()))
                 .collect(Collectors.toList()).isEmpty();
     }
 
@@ -189,14 +188,14 @@ public class EventService {
                 .map(invitation -> invitationService.convertToDto(invitation))
                 .collect(Collectors.toList()) : null);
 
-        if(event.getPhoto() != null){
+        if (event.getPhoto() != null) {
             try {
 
 
-                eventDto.setPhoto(event.getPhoto().toString());
+                eventDto.setPhoto(FileUtils.getEncodedStringFromBlob(event.getPhoto()));
 
 
-            } catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -224,15 +223,13 @@ public class EventService {
             }
         }
 
-        if(eventDTO.getPhoto() != null){
+        if (eventDTO.getPhoto() != null) {
             try {
 
-                Blob photoBlob = new SerialBlob(eventDTO.getPhoto().getBytes());
-                event.setPhoto(photoBlob);
+                event.setPhoto(FileUtils.getBlobFromEncodedString(eventDTO.getPhoto()));
 
 
-
-            } catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
