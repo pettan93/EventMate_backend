@@ -14,31 +14,6 @@ public class SubmissionDTO {
 
     private Integer earnedPoints;
 
-    private Long taskId;
-
-    public Long getTaskId() {
-        return taskId;
-    }
-
-    public void setTaskId(Long taskId) {
-        this.taskId = taskId;
-    }
-
-    public Integer getEarnedPoints() {
-        return earnedPoints;
-    }
-
-    public Integer getMaxPoints() {
-        return maxPoints;
-    }
-
-    public void setMaxPoints(Integer maxPoints) {
-        this.maxPoints = maxPoints;
-    }
-
-    public void setEarnedPoints(Integer earnedPoints) {
-        this.earnedPoints = earnedPoints;
-    }
 
     public Long getId() {
         return id;
@@ -64,4 +39,19 @@ public class SubmissionDTO {
         this.submitter = submitter;
     }
 
+    public Integer getMaxPoints() {
+        return maxPoints;
+    }
+
+    public void setMaxPoints(Integer maxPoints) {
+        this.maxPoints = maxPoints;
+    }
+
+    public Integer getEarnedPoints() {
+        return earnedPoints;
+    }
+
+    public void setEarnedPoints(Integer earnedPoints) {
+        this.earnedPoints = earnedPoints;
+    }
 }

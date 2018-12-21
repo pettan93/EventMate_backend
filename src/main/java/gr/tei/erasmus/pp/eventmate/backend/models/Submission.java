@@ -16,7 +16,6 @@ public class Submission {
     @ManyToOne
     private User submitter;
 
-
     private Integer earnedPoints;
 
     public Submission() {

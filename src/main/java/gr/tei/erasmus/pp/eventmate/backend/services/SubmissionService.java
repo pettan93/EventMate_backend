@@ -2,16 +2,19 @@ package gr.tei.erasmus.pp.eventmate.backend.services;
 
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.SubmissionDTO;
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.SubmissionFileDTO;
+import gr.tei.erasmus.pp.eventmate.backend.enums.FileType;
 import gr.tei.erasmus.pp.eventmate.backend.models.Submission;
 import gr.tei.erasmus.pp.eventmate.backend.models.SubmissionFile;
 import gr.tei.erasmus.pp.eventmate.backend.models.Task;
 import gr.tei.erasmus.pp.eventmate.backend.models.User;
-import gr.tei.erasmus.pp.eventmate.backend.utils.FileUtils;
+import gr.tei.erasmus.pp.eventmate.backend.repository.SubmissionRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Blob;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,7 +27,36 @@ public class SubmissionService {
     private TaskService taskService;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private EventService eventService;
+    @Autowired
+    private SubmissionRepository submissionRepository;
 
+
+    public Task submit(User user, Task task, Blob data) {
+
+        var submission = getUserSubmissionForTask(task, user);
+
+        if (submission == null) {
+            submission = new Submission();
+            submission.setSubmitter(user);
+            submission.setContent(new ArrayList<>());
+        } else {
+            var i = task.getSubmissions().indexOf(submission);
+            task.getSubmissions().remove(i);
+        }
+
+        var submissionFile = new SubmissionFile();
+        submissionFile.setCreated(new Date());
+        submissionFile.setType(FileType.PHOTO); // TODO
+        submissionFile.setContent(data);
+
+        submission.getContent().add(submissionFile);
+
+        task.getSubmissions().add(submission);
+
+        return taskService.saveTask(task);
+    }
 
     public Boolean isSubmissionValid(Task task, Submission submission) {
 
@@ -32,6 +64,25 @@ public class SubmissionService {
         return true;
     }
 
+    public Boolean hasPermissionForSubmissionFile(User user, SubmissionFile submissionFile) {
+
+        var submissions = submissionRepository.findAll()
+                .stream()
+                .filter(submission -> submission.getContent() != null && submission.getContent().contains(submissionFile))
+                .collect(Collectors.toList());
+
+        var submission = submissions.get(0);
+
+        var task = getParentTask(submission);
+
+        var event = eventService.getParentEvent(task);
+
+        return eventService.isOwner(user, event) || taskService.isOwner(user, task) || submission.getSubmitter().equals(user);
+    }
+
+    public Boolean hasPermissionForSubmittion(User user, Task task) {
+        return task.getAssignees().contains(user);
+    }
 
     public Submission getUserSubmissionForTask(Task task, User user) {
 
@@ -43,7 +94,7 @@ public class SubmissionService {
         return userSubmissions.size() == 0 ? null : userSubmissions.get(0);
     }
 
-    public Submission addTaskSubmission(Task task, Submission submission) {
+    public Task addTaskSubmission(Task task, Submission submission) {
 
 
         Submission userSubmission = getUserSubmissionForTask(task, submission.getSubmitter());
@@ -53,12 +104,24 @@ public class SubmissionService {
 
         task.getSubmissions().add(submission);
 
+//        submissionRepository.save(submission);
+
         taskService.saveTask(task);
 
-        return submission;
+        return task;
     }
 
-    private Task getParentTask(Submission s) {
+    public Task assignPoints(Task task, Submission submission, Long points) {
+
+        submission.setEarnedPoints(Long.valueOf(points).intValue());
+
+
+        submissionRepository.save(submission);
+
+        return task;
+    }
+
+    public Task getParentTask(Submission s) {
 
         List<Task> tasks = taskService.getAllTasks()
                 .stream()
@@ -74,8 +137,9 @@ public class SubmissionService {
 
         Task parentTask = getParentTask(submission);
 
+
         submissionDto.setMaxPoints(parentTask.getPoints().intValue());
-        submissionDto.setTaskId(parentTask.getId());
+
 
         if (submission.getContent() != null && submission.getContent().size() > 0) {
 
@@ -129,7 +193,9 @@ public class SubmissionService {
         SubmissionFileDTO submittionFileDto = modelMapper.map(submittionFile, SubmissionFileDTO.class);
 
 
-        submittionFileDto.setContent(FileUtils.getEncodedStringFromBlob(submittionFile.getContent()));
+//        if (submittionFile.getContent() != null) {
+//            submittionFileDto.setContent(FileUtils.getEncodedStringFromBlob(submittionFile.getContent()));
+//        }
 
 
         return submittionFileDto;
@@ -140,7 +206,9 @@ public class SubmissionService {
 
         SubmissionFile submissionFile = modelMapper.map(submissionFileDto, SubmissionFile.class);
 
-        submissionFile.setContent(FileUtils.getBlobFromEncodedString(submissionFileDto.getContent()));
+//        if (submissionFileDto.getContent() != null) {
+//            submissionFile.setContent(FileUtils.getBlobFromEncodedString(submissionFileDto.getContent()));
+//        }
 
 
         return submissionFile;

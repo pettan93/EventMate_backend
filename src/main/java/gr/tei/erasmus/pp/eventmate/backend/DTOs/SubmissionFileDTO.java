@@ -8,8 +8,6 @@ public class SubmissionFileDTO {
 
     private Long id;
 
-    private String content;
-
     private FileType type;
 
     private Date created;
@@ -21,14 +19,6 @@ public class SubmissionFileDTO {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
     }
 
     public FileType getType() {

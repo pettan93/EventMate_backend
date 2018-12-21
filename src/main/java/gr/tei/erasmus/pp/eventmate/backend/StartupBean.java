@@ -98,21 +98,20 @@ public class StartupBean {
                 null
         );
 
-        task1.setTaskState(TaskState.IN_PLAY);
+        task1.setTaskState(TaskState.IN_REVIEW);
 
         task1.setTaskOwner(user1);
         task1.setAssignees(Arrays.asList(user2, user3));
 
 
         var sbf = new SubmissionFile();
-        sbf.setContent(FileUtils.getFileBlob(new File("joke.jpg")));
+        sbf.setContent(FileUtils.getFileBlob(new File("blank.jpg")));
         sbf.setType(FileType.PHOTO);
         sbf.setCreated(new Date());
 
         var submission1 = new Submission();
         submission1.setSubmitter(user2);
         submission1.setContent(Arrays.asList(sbf));
-
 
         task1.setSubmissions(Arrays.asList(submission1));
 

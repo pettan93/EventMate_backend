@@ -1,7 +1,6 @@
 package gr.tei.erasmus.pp.eventmate.backend.DTOs;
 
 import gr.tei.erasmus.pp.eventmate.backend.enums.TaskState;
-import gr.tei.erasmus.pp.eventmate.backend.models.Submission;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -23,7 +22,7 @@ public class TaskDTO {
 
     private Long points;
 
-    private List<Submission> submissions;
+    private List<SubmissionDTO> submissions;
 
     private Blob photo;
 
@@ -130,11 +129,11 @@ public class TaskDTO {
         this.points = points;
     }
 
-    public List<Submission> getSubmissions() {
+    public List<SubmissionDTO> getSubmissions() {
         return submissions;
     }
 
-    public void setSubmissions(List<Submission> submissions) {
+    public void setSubmissions(List<SubmissionDTO> submissions) {
         this.submissions = submissions;
     }
 

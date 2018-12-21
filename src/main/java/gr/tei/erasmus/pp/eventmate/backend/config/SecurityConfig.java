@@ -28,6 +28,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/task/**",
                         "/user",
                         "/user/**",
+                        "/file",
+                        "/file/**",
+                        "/submission",
+                        "/submission/**",
                         "/me",
                         "/me/**").authenticated()
                 .and()

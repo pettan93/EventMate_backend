@@ -69,7 +69,6 @@ public class TaskResource {
         if (!taskService.isOwner(user, taskOptional.get()) || !eventService.isOwner(user,eventService.getParentEvent(taskOptional.get())))
             return ResponseEntity.status(403).build();
 
-        System.out.println("delete task");
 
         eventService.getParentEvent(taskOptional.get()).getTasks().remove(taskOptional.get());
 

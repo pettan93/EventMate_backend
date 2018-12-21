@@ -24,6 +24,8 @@ public class TaskService {
     private UserService userService;
     @Autowired
     private EventService eventService;
+    @Autowired
+    private SubmissionService submissionService;
 
     public Boolean hasPermission(User user, Task task) {
         return task.getAssignees().contains(user) || task.getTaskOwner().equals(user);
@@ -33,8 +35,8 @@ public class TaskService {
         return task.getTaskOwner().equals(user);
     }
 
-    public void saveTask(Task task){
-        taskRepository.save(task);
+    public Task saveTask(Task task){
+        return taskRepository.save(task);
     }
 
     public Task createTask(Task task) {
@@ -42,9 +44,17 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
+    public Optional<Task> getById(long id){
+        return taskRepository.findById(id);
+    }
+
 
     public Boolean isTaskInSubmissionState(Task task){
         return task.getTaskState().equals(TaskState.IN_PLAY);
+    }
+
+    public Boolean isTaskInReviewState(Task task){
+        return task.getTaskState().equals(TaskState.IN_REVIEW);
     }
 
     public Boolean isUserAssignee(Task task, User user){
@@ -97,6 +107,11 @@ public class TaskService {
         taskDto.setAssignees(task.getAssignees() != null ? task.getAssignees()
                 .stream()
                 .map(assignee -> userService.convertToDto(assignee))
+                .collect(Collectors.toList()) : null);
+
+        taskDto.setSubmissions(task.getSubmissions() != null ? task.getSubmissions()
+                .stream()
+                .map(submission -> submissionService.convertToDto(submission))
                 .collect(Collectors.toList()) : null);
 
         taskDto.setTaskOwner(userService.convertToDto(task.getTaskOwner()));
