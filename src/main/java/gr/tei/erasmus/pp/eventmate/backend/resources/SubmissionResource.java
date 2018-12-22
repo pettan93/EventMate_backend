@@ -6,7 +6,6 @@ import gr.tei.erasmus.pp.eventmate.backend.models.Task;
 import gr.tei.erasmus.pp.eventmate.backend.models.User;
 import gr.tei.erasmus.pp.eventmate.backend.models.UserPrincipal;
 import gr.tei.erasmus.pp.eventmate.backend.repository.SubmissionRepository;
-import gr.tei.erasmus.pp.eventmate.backend.repository.TaskRepository;
 import gr.tei.erasmus.pp.eventmate.backend.services.EventService;
 import gr.tei.erasmus.pp.eventmate.backend.services.SubmissionService;
 import gr.tei.erasmus.pp.eventmate.backend.services.TaskService;
@@ -21,8 +20,7 @@ import java.util.stream.Collectors;
 
 @RestController
 public class SubmissionResource {
-    @Autowired
-    private TaskRepository taskRepository;
+
     @Autowired
     private TaskService taskService;
     @Autowired
@@ -38,7 +36,7 @@ public class SubmissionResource {
      */
     @GetMapping("/task/{id}/submission")
     public ResponseEntity<Object> getTaskSumission(@PathVariable long id) {
-        Optional<Task> task = taskRepository.findById(id);
+        Optional<Task> task = taskService.getById(id);
 
         if (task.isEmpty())
             return ResponseEntity.notFound().build();
@@ -65,7 +63,7 @@ public class SubmissionResource {
     public ResponseEntity<Object> saveSubmission(@PathVariable long id,
                                                  @RequestBody SubmissionDTO submissionDTO) {
 
-        Optional<Task> taskOptional = taskRepository.findById(id);
+        Optional<Task> taskOptional = taskService.getById(id);
 
         if (taskOptional.isEmpty())
             return ResponseEntity.notFound().build();
