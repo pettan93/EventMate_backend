@@ -18,6 +18,7 @@ import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 
 @Component
@@ -119,6 +120,61 @@ public class StartupBean {
 
 
         eventRepository.save(event1);
+
+// ------------------------
+
+        var event2 = new Event(
+                "Another finished event",
+                date1,
+                "Sport 321 !!",
+                new ArrayList<>(),
+                EventState.FINISHED,
+                new ArrayList<>());
+
+        event2.setEventOwner(user2);
+        event2.setGuests(Arrays.asList(user1, user3, user4));
+
+
+
+        var task2 = new Task(
+                "Kiss your crush",
+                "Ampfitear",
+                "Just kiss her",
+                50L,
+                null
+        );
+
+        task2.setTaskState(TaskState.FINISHED);
+
+        task2.setTaskOwner(user4);
+        task2.setAssignees(Collections.singletonList(user2));
+
+        var sbf2 = new SubmissionFile();
+        sbf2.setContent(FileUtils.getFileBlob(new File("blank.jpg")));
+        sbf2.setType(FileType.PHOTO);
+        sbf2.setCreated(new Date());
+
+        var submission2 = new Submission();
+        submission1.setSubmitter(user2);
+        submission1.setContent(Collections.singletonList(sbf2));
+        submission1.setEarnedPoints(40);
+
+        submission2.setContent(Collections.singletonList(sbf2));
+
+        var report = new Report();
+        report.setComment("Prvni report, dost cool");
+        report.setCreated(new Date());
+        report.setName("Report 1");
+        report.setType(ReportType.CERTIFICATE);
+        report.setPreview(FileUtils.getFileBlob(new File("blank.jpg")));
+        report.setContent(FileUtils.getFileBlob(new File("blank.jpg")));
+
+        event2.setTasks(Collections.singletonList(task2));
+        event2.setReports(Collections.singletonList(report));
+
+        eventRepository.save(event2);
+
+
 
     }
 

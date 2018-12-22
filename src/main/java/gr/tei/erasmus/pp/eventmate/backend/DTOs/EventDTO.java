@@ -1,9 +1,7 @@
 package gr.tei.erasmus.pp.eventmate.backend.DTOs;
 
 import gr.tei.erasmus.pp.eventmate.backend.enums.EventState;
-import gr.tei.erasmus.pp.eventmate.backend.models.Report;
 
-import java.sql.Blob;
 import java.util.Date;
 import java.util.List;
 
@@ -21,7 +19,7 @@ public class EventDTO {
 
     private EventState state;
 
-    private List<Report> reports;
+    private List<ReportDTO> reports;
 
     private List<InvitationDTO> invitations;
 
@@ -149,11 +147,11 @@ public class EventDTO {
         this.state = state;
     }
 
-    public List<Report> getReports() {
+    public List<ReportDTO> getReports() {
         return reports;
     }
 
-    public void setReports(List<Report> reports) {
+    public void setReports(List<ReportDTO> reports) {
         this.reports = reports;
     }
 

@@ -33,7 +33,7 @@ public class FileService {
     }
 
     public Blob getReportPreview(Report report){
-        return report.getPhoto();
+        return report.getPreview();
     }
 
 

@@ -6,6 +6,7 @@ import gr.tei.erasmus.pp.eventmate.backend.DTOs.TaskDTO;
 import gr.tei.erasmus.pp.eventmate.backend.models.*;
 import gr.tei.erasmus.pp.eventmate.backend.repository.EventRepository;
 import gr.tei.erasmus.pp.eventmate.backend.services.EventService;
+import gr.tei.erasmus.pp.eventmate.backend.services.ReportService;
 import gr.tei.erasmus.pp.eventmate.backend.services.TaskService;
 import gr.tei.erasmus.pp.eventmate.backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,8 @@ public class EventResource {
     private TaskService taskService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private ReportService reportService;
 
 
     /**
@@ -70,6 +73,7 @@ public class EventResource {
                 .collect(Collectors.toList()));
     }
 
+
     /**
      * Permission: Everyone
      */
@@ -78,9 +82,12 @@ public class EventResource {
 
         Event event = eventService.convertToEntity(eventDto);
 
+        if(eventService.isNameUsed(event.getName()))
+            return ResponseEntity.status(400).body("Eventname is already used");
+
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
-        Event savedEvent = eventService.createEvent(user,event);
+        Event savedEvent = eventService.createEvent(user, event);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(eventService.convertToDto(savedEvent));
     }
@@ -127,11 +134,11 @@ public class EventResource {
         if (!eventService.hasPermission(user, eventOptional.get()))
             return ResponseEntity.status(403).build();
 
-        if(!eventService.isEditable(eventOptional.get()))
+        if (!eventService.isEditable(eventOptional.get()))
             return ResponseEntity.status(400).body("Event is no longer in editable mode.");
 
 
-        Task savedTask = taskService.createTask(user,task);
+        Task savedTask = taskService.createTask(user, task);
 
         eventService.addTask(eventOptional.get(), task);
 
@@ -180,14 +187,11 @@ public class EventResource {
             return ResponseEntity.status(403).build();
 
 
-
         Event savedEvent = eventService.pushEventState(eventOptional.get());
 
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(eventService.convertToDto(savedEvent));
     }
-
-
 
 
 }

@@ -2,10 +2,7 @@ package gr.tei.erasmus.pp.eventmate.backend.services;
 
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.EventDTO;
 import gr.tei.erasmus.pp.eventmate.backend.enums.EventState;
-import gr.tei.erasmus.pp.eventmate.backend.models.Event;
-import gr.tei.erasmus.pp.eventmate.backend.models.Invitation;
-import gr.tei.erasmus.pp.eventmate.backend.models.Task;
-import gr.tei.erasmus.pp.eventmate.backend.models.User;
+import gr.tei.erasmus.pp.eventmate.backend.models.*;
 import gr.tei.erasmus.pp.eventmate.backend.repository.EventRepository;
 import gr.tei.erasmus.pp.eventmate.backend.repository.TaskRepository;
 import gr.tei.erasmus.pp.eventmate.backend.utils.FileUtils;
@@ -33,7 +30,13 @@ public class EventService {
     private UserService userService;
     @Autowired
     private InvitationService invitationService;
+    @Autowired
+    private ReportService reportService;
 
+
+    public Boolean isNameUsed(String name){
+         return eventRepository.findByName(name.strip()) != null;
+    }
 
     public Boolean hasPermission(User user, Event event) {
 //        System.out.println("has permission user " + user + " na " + event);
@@ -44,6 +47,9 @@ public class EventService {
         return event.getEventOwner().equals(user);
     }
 
+    public Event saveEvent(Event e){
+        return eventRepository.save(e);
+    }
 
     public Event asignOwner(User user, Event event) {
 
@@ -137,6 +143,7 @@ public class EventService {
     }
 
 
+
     public Boolean isEditable(Event event) {
         return event.getState().equals(EventState.EDITABLE);
     }
@@ -155,13 +162,19 @@ public class EventService {
     }
 
     public Event getParentEvent(Task task) {
-
         return eventRepository.findAll()
                 .stream()
                 .filter(event -> (event.getTasks().contains(task)))
                 .collect(Collectors.toList()).get(0);
     }
 
+    public Event getParentEvent(Report report) {
+
+        return eventRepository.findAll()
+                .stream()
+                .filter(event -> (event.getReports() != null && event.getReports().contains(report)))
+                .collect(Collectors.toList()).get(0);
+    }
 
     public EventDTO convertToDto(Event event) {
 
@@ -186,6 +199,11 @@ public class EventService {
         eventDto.setInvitations(event.getInvitations() != null ? event.getInvitations()
                 .stream()
                 .map(invitation -> invitationService.convertToDto(invitation))
+                .collect(Collectors.toList()) : null);
+
+        eventDto.setReports(event.getReports() != null ? event.getReports()
+                .stream()
+                .map(report -> reportService.convertToDto(report))
                 .collect(Collectors.toList()) : null);
 
         if (event.getPhoto() != null) {

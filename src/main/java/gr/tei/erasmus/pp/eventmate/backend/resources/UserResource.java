@@ -40,6 +40,10 @@ public class UserResource {
 
         User newUser = userService.register(user);
 
+        if(userService.isUserNameUsed(user.getUserName()))
+            return ResponseEntity.status(400).body("Username is already used");
+
+
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(userService.convertToDto(newUser));
     }
 

@@ -1,15 +1,11 @@
 package gr.tei.erasmus.pp.eventmate.backend.resources;
 
-import gr.tei.erasmus.pp.eventmate.backend.models.SubmissionFile;
-import gr.tei.erasmus.pp.eventmate.backend.models.Task;
-import gr.tei.erasmus.pp.eventmate.backend.models.User;
-import gr.tei.erasmus.pp.eventmate.backend.models.UserPrincipal;
+import gr.tei.erasmus.pp.eventmate.backend.models.*;
 import gr.tei.erasmus.pp.eventmate.backend.repository.SubmissionFileRepository;
-import gr.tei.erasmus.pp.eventmate.backend.services.FileService;
-import gr.tei.erasmus.pp.eventmate.backend.services.SubmissionService;
-import gr.tei.erasmus.pp.eventmate.backend.services.TaskService;
+import gr.tei.erasmus.pp.eventmate.backend.services.*;
 import gr.tei.erasmus.pp.eventmate.backend.utils.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +24,10 @@ public class FileResource {
     private SubmissionService submissionService;
     @Autowired
     private TaskService taskService;
-
+    @Autowired
+    private ReportService reportService;
+    @Autowired
+    private EventService eventService;
 
     /**
      * Permission: Event Owner, Task owner and submitter
@@ -54,6 +53,107 @@ public class FileResource {
     /**
      * Permission: Everyone involved in event
      */
+    @GetMapping("/file/report/{id}/content")
+    public ResponseEntity<Object> getReportContent(@PathVariable long id) {
+
+        Optional<Report> report = reportService.getReportById(id);
+
+        if (report.isEmpty())
+            return ResponseEntity.notFound().build();
+
+        User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+
+        if (!eventService.hasPermission(user, eventService.getParentEvent(report.get())))
+            return ResponseEntity.status(403).body("Use dont have permission for read given report");
+
+        String data = FileUtils.getEncodedStringFromBlob(report.get().getContent());
+
+        return ResponseEntity.ok(data);
+    }
+
+    /**
+     * Permission: Everyone involved in event
+     */
+    @GetMapping("/file/report/{id}/preview")
+    public ResponseEntity<Object> getReportPreview(@PathVariable long id) {
+
+        Optional<Report> report = reportService.getReportById(id);
+
+        if (report.isEmpty())
+            return ResponseEntity.notFound().build();
+
+        User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+
+        if (!eventService.hasPermission(user, eventService.getParentEvent(report.get())))
+            return ResponseEntity.status(403).body("Use dont have permission for read given report");
+
+        String data = FileUtils.getEncodedStringFromBlob(report.get().getPreview());
+
+        return ResponseEntity.ok(data);
+    }
+
+    /**
+     * Permission: Everyone involved in event
+     */
+    @PostMapping("/file/report/{id}/content")
+    public ResponseEntity<Object> saveReportContent(@PathVariable long id,@RequestBody String fileString) {
+
+        Optional<Report> reportOptional = reportService.getReportById(id);
+
+        if (reportOptional.isEmpty())
+            return ResponseEntity.notFound().build();
+
+        User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+
+        if (!eventService.hasPermission(user, eventService.getParentEvent(reportOptional.get())))
+            return ResponseEntity.status(403).body("User dont have permission for read given report");
+
+        Blob file = FileUtils.getBlobFromEncodedString(fileString);
+
+        reportOptional.get().setContent(file);
+
+        var report = reportOptional.get();
+
+        report.setContent(file);
+
+        var savedReport = reportService.saveReport(report);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(reportService.convertToDto(savedReport));
+    }
+
+//    /**
+//     * Permission: Everyone involved in event
+//     */
+//    @PostMapping("/file/report/{id}/preview")
+//    public ResponseEntity<Object> saveReportPreview(@PathVariable long id,@RequestBody String fileString) {
+//
+//        Optional<Report> reportOptional = reportService.getReportById(id);
+//
+//        if (reportOptional.isEmpty())
+//            return ResponseEntity.notFound().build();
+//
+//        User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+//
+//        if (!eventService.hasPermission(user, eventService.getParentEvent(reportOptional.get())))
+//            return ResponseEntity.status(403).body("User dont have permission for read given report");
+//
+//        Blob file = FileUtils.getBlobFromEncodedString(fileString);
+//
+//
+//        reportOptional.get().setPreview(file);
+//
+//        var report = reportOptional.get();
+//
+//        report.setContent(file);
+//
+//        var savedReport = reportService.saveReport(report);
+//
+//        return ResponseEntity.status(HttpStatus.CREATED).body(reportService.convertToDto(savedReport));
+//    }
+
+    /**
+     * Permission: Everyone involved in event
+     */
     @PostMapping("/file/submissionFile/task/{id}")
     public ResponseEntity<Object> uploadSubmissionForTask(@PathVariable long id, @RequestBody String fileString) {
 
@@ -69,7 +169,7 @@ public class FileResource {
 
         Blob file = FileUtils.getBlobFromEncodedString(fileString);
 
-        var updatedTask = submissionService.submit(user,taskOptional.get(),file);
+        var updatedTask = submissionService.submit(user, taskOptional.get(), file);
 
         return ResponseEntity.ok(taskService.convertToDto(updatedTask));
     }

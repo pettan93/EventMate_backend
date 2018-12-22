@@ -36,6 +36,9 @@ public class UserService {
     }
 
 
+    public Boolean isUserNameUsed(String userName){
+        return userRepository.findByUserName(userName.strip()) != null;
+    }
 
     public User register(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));

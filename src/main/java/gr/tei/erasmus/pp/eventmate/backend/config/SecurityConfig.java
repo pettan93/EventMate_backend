@@ -32,6 +32,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/file/**",
                         "/submission",
                         "/submission/**",
+                        "/report",
+                        "/report/**",
                         "/me",
                         "/me/**").authenticated()
                 .and()
