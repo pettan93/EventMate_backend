@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -103,7 +104,8 @@ public class UserResource {
         if (result.isEmpty())
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .build();
+                    .body(new ArrayList<>());
+
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
