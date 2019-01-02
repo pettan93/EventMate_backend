@@ -5,7 +5,6 @@ import gr.tei.erasmus.pp.eventmate.backend.enums.TaskState;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.sql.Blob;
 import java.util.List;
 
 public class TaskDTO {
@@ -24,7 +23,7 @@ public class TaskDTO {
 
     private List<SubmissionDTO> submissions;
 
-    private Blob photo;
+    private String photo;
 
     private TaskState taskState;
 
@@ -137,11 +136,11 @@ public class TaskDTO {
         this.submissions = submissions;
     }
 
-    public Blob getPhoto() {
+    public String getPhoto() {
         return photo;
     }
 
-    public void setPhoto(Blob photo) {
+    public void setPhoto(String photo) {
         this.photo = photo;
     }
 

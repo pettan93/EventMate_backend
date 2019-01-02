@@ -1,7 +1,5 @@
 package gr.tei.erasmus.pp.eventmate.backend.DTOs;
 
-import java.sql.Blob;
-
 public class UserDTO {
 
     private Long id;
@@ -10,7 +8,7 @@ public class UserDTO {
 
     private String email;
 
-    private Blob photo;
+    private String photo;
 
     private Integer score;
 
@@ -44,11 +42,11 @@ public class UserDTO {
         this.email = email;
     }
 
-    public Blob getPhoto() {
+    public String getPhoto() {
         return photo;
     }
 
-    public void setPhoto(Blob photo) {
+    public void setPhoto(String photo) {
         this.photo = photo;
     }
 

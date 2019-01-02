@@ -5,6 +5,7 @@ import gr.tei.erasmus.pp.eventmate.backend.enums.TaskState;
 import gr.tei.erasmus.pp.eventmate.backend.models.Task;
 import gr.tei.erasmus.pp.eventmate.backend.models.User;
 import gr.tei.erasmus.pp.eventmate.backend.repository.TaskRepository;
+import gr.tei.erasmus.pp.eventmate.backend.utils.FileUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -118,6 +119,14 @@ public class TaskService {
 
         taskDto.setEventId(eventService.getParentEvent(task).getId());
 
+        if (task.getPhoto() != null) {
+            try {
+                taskDto.setPhoto(FileUtils.getEncodedStringFromBlob(task.getPhoto()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         return taskDto;
     }
 
@@ -136,6 +145,15 @@ public class TaskService {
                 task.setSubmissions(existingTask.getSubmissions());
 
 
+            }
+        }
+
+
+        if (taskDto.getPhoto() != null) {
+            try {
+                task.setPhoto(FileUtils.getBlobFromEncodedString(taskDto.getPhoto()));
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
 

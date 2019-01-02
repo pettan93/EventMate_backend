@@ -209,9 +209,7 @@ public class EventService {
         if (event.getPhoto() != null) {
             try {
 
-
-                eventDto.setPhoto(FileUtils.getEncodedStringFromBlob(event.getPhoto()));
-
+               eventDto.setPhoto(FileUtils.getEncodedStringFromBlob(event.getPhoto()));
 
             } catch (Exception e) {
                 e.printStackTrace();

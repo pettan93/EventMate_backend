@@ -4,6 +4,7 @@ import gr.tei.erasmus.pp.eventmate.backend.DTOs.UserDTO;
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.UserPublicDTO;
 import gr.tei.erasmus.pp.eventmate.backend.models.User;
 import gr.tei.erasmus.pp.eventmate.backend.repository.UserRepository;
+import gr.tei.erasmus.pp.eventmate.backend.utils.FileUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -81,6 +82,14 @@ public class UserService {
         userDto.setAttendedEvents(userEvents.size());
         userDto.setOrganizedEvents(oragnizedEvents.size());
 
+        if (user.getPhoto() != null) {
+            try {
+                userDto.setPhoto(FileUtils.getEncodedStringFromBlob(user.getPhoto()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         return userDto;
 
     }
@@ -89,12 +98,30 @@ public class UserService {
 
         User user = modelMapper.map(userDTO, User.class);
 
+        if (userDTO.getPhoto() != null) {
+            try {
+                user.setPhoto(FileUtils.getBlobFromEncodedString(userDTO.getPhoto()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         return user;
     }
 
     public UserPublicDTO convertToPublicDto(User user) {
 
-        return modelMapper.map(user, UserPublicDTO.class);
+        UserPublicDTO userDto = modelMapper.map(user, UserPublicDTO.class);
+
+        if (user.getPhoto() != null) {
+            try {
+                userDto.setPhoto(FileUtils.getEncodedStringFromBlob(user.getPhoto()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return userDto;
     }
 
 

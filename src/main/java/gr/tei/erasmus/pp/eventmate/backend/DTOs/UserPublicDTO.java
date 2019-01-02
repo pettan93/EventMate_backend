@@ -1,14 +1,12 @@
 package gr.tei.erasmus.pp.eventmate.backend.DTOs;
 
-import java.sql.Blob;
-
 public class UserPublicDTO {
 
     private Long id;
 
     private String userName;
 
-    private Blob photo;
+    private String photo;
 
 
 
@@ -28,11 +26,11 @@ public class UserPublicDTO {
         this.userName = userName;
     }
 
-    public Blob getPhoto() {
+    public String getPhoto() {
         return photo;
     }
 
-    public void setPhoto(Blob photo) {
+    public void setPhoto(String photo) {
         this.photo = photo;
     }
 }

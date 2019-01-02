@@ -68,6 +68,8 @@ public class StartupBean {
         User user3 = new User("user3", "user3@email", "pass", null, 0);
         User user4 = new User("user4", "user4@email", "pass", null, 0);
 
+        user1.setPhoto(FileUtils.getFileBlob(new File("blank.jpg")));
+
         userService.register(Arrays.asList(user1, user2, user3, user4));
 
         Date date1 = DateUtils.toDate(LocalDateTime.now()
@@ -82,6 +84,8 @@ public class StartupBean {
                 new ArrayList<>(),
                 EventState.IN_PLAY,
                 new ArrayList<>());
+
+        event1.setPhoto(FileUtils.getFileBlob(new File("blank.jpg")));
 
         event1.setEventOwner(user1);
         event1.setGuests(Arrays.asList(user2, user3));
@@ -98,6 +102,8 @@ public class StartupBean {
                 10L,
                 null
         );
+
+        task1.setPhoto(FileUtils.getFileBlob(new File("blank.jpg")));
 
         task1.setTaskState(TaskState.IN_REVIEW);
 
