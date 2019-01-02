@@ -1,6 +1,7 @@
 package gr.tei.erasmus.pp.eventmate.backend;
 
 
+import gr.tei.erasmus.pp.eventmate.backend.utils.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
@@ -14,6 +15,15 @@ import java.sql.SQLException;
 import java.util.Base64;
 
 public class Tst {
+
+    @Test
+    public void testStringFromFile(){
+
+        Blob blob = FileUtils.getFileBlob(new File("joke.jpg"));
+
+        System.out.println(FileUtils.getEncodedStringFromBlob(blob));
+
+    }
 
     @Test
     public void testStream() throws IOException {
