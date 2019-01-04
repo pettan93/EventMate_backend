@@ -1,5 +1,6 @@
 package gr.tei.erasmus.pp.eventmate.backend.resources;
 
+import gr.tei.erasmus.pp.eventmate.backend.DTOs.UserDTO;
 import gr.tei.erasmus.pp.eventmate.backend.enums.InvitationState;
 import gr.tei.erasmus.pp.eventmate.backend.models.Event;
 import gr.tei.erasmus.pp.eventmate.backend.models.Task;
@@ -37,13 +38,12 @@ public class UserResource {
 
 
     @PostMapping("/public/register")
-    public ResponseEntity<Object> registerNewUser(@RequestBody User user) {
+    public ResponseEntity<Object> registerNewUser(@RequestBody UserDTO user) {
 
-        User newUser = userService.register(user);
+        if(userService.isEmailUsed(user.getEmail()))
+            return ResponseEntity.status(400).body("User email is already used");
 
-        if(userService.isUserNameUsed(user.getUserName()))
-            return ResponseEntity.status(400).body("Username is already used");
-
+        User newUser = userService.register(userService.convertToEntity(user));
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(userService.convertToDto(newUser));
     }

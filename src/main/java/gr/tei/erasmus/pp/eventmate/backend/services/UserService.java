@@ -37,8 +37,8 @@ public class UserService {
     }
 
 
-    public Boolean isUserNameUsed(String userName){
-        return userRepository.findByUserName(userName.strip()) != null;
+    public Boolean isEmailUsed(String userName) {
+        return userRepository.findByEmail(userName.strip()) != null;
     }
 
     public User register(User user) {
@@ -90,6 +90,8 @@ public class UserService {
             }
         }
 
+        userDto.setPassword("");
+
         return userDto;
 
     }
@@ -97,6 +99,8 @@ public class UserService {
     public User convertToEntity(UserDTO userDTO) {
 
         User user = modelMapper.map(userDTO, User.class);
+
+
 
         if (userDTO.getPhoto() != null) {
             try {
@@ -123,7 +127,6 @@ public class UserService {
 
         return userDto;
     }
-
 
 
 }

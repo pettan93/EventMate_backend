@@ -19,7 +19,7 @@ public class Tst {
     @Test
     public void testStringFromFile(){
 
-        Blob blob = FileUtils.getFileBlob(new File("joke.jpg"));
+        Blob blob = FileUtils.getFileBlob(new File("aa.jpg"));
 
         System.out.println(FileUtils.getEncodedStringFromBlob(blob));
 

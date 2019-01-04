@@ -10,13 +10,21 @@ public class UserDTO {
 
     private String photo;
 
+    private String password;
+
     private Integer score;
 
     private Integer organizedEvents;
 
     private Integer attendedEvents;
 
+    public String getPassword() {
+        return password;
+    }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
     public Long getId() {
         return id;
