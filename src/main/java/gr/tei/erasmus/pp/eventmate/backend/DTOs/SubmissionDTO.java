@@ -6,6 +6,12 @@ public class SubmissionDTO {
 
     private Long id;
 
+    private String taskName;
+
+    private String taskPhoto;
+
+    private String taskDescription;
+
     private ArrayList<SubmissionFileDTO> content;
 
     private UserDTO submitter;
@@ -13,7 +19,6 @@ public class SubmissionDTO {
     private Integer maxPoints;
 
     private Integer earnedPoints;
-
 
     public Long getId() {
         return id;
@@ -53,5 +58,29 @@ public class SubmissionDTO {
 
     public void setEarnedPoints(Integer earnedPoints) {
         this.earnedPoints = earnedPoints;
+    }
+
+    public String getTaskDescription() {
+        return taskDescription;
+    }
+
+    public void setTaskDescription(String taskDescription) {
+        this.taskDescription = taskDescription;
+    }
+
+    public String getTaskName() {
+        return taskName;
+    }
+
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
+    }
+
+    public String getTaskPhoto() {
+        return taskPhoto;
+    }
+
+    public void setTaskPhoto(String taskPhoto) {
+        this.taskPhoto = taskPhoto;
     }
 }

@@ -8,6 +8,7 @@ import gr.tei.erasmus.pp.eventmate.backend.models.SubmissionFile;
 import gr.tei.erasmus.pp.eventmate.backend.models.Task;
 import gr.tei.erasmus.pp.eventmate.backend.models.User;
 import gr.tei.erasmus.pp.eventmate.backend.repository.SubmissionRepository;
+import gr.tei.erasmus.pp.eventmate.backend.utils.FileUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -137,9 +138,10 @@ public class SubmissionService {
 
         Task parentTask = getParentTask(submission);
 
-
+        submissionDto.setTaskName(parentTask.getName());
+        submissionDto.setTaskDescription(parentTask.getDescription());
+        submissionDto.setTaskPhoto(FileUtils.getEncodedStringFromBlob(parentTask.getPhoto()));
         submissionDto.setMaxPoints(parentTask.getPoints().intValue());
-
 
         if (submission.getContent() != null && submission.getContent().size() > 0) {
 
