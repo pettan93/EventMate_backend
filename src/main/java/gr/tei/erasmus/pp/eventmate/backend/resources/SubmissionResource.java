@@ -9,6 +9,7 @@ import gr.tei.erasmus.pp.eventmate.backend.repository.SubmissionRepository;
 import gr.tei.erasmus.pp.eventmate.backend.services.EventService;
 import gr.tei.erasmus.pp.eventmate.backend.services.SubmissionService;
 import gr.tei.erasmus.pp.eventmate.backend.services.TaskService;
+import gr.tei.erasmus.pp.eventmate.backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,8 @@ public class SubmissionResource {
     private SubmissionService submissionService;
     @Autowired
     private EventService eventService;
+    @Autowired
+    private UserService userService;
     @Autowired
     private SubmissionRepository submissionRepository;
 
@@ -99,6 +102,7 @@ public class SubmissionResource {
         if (!taskService.isTaskInSubmissionState(taskOptional.get()))
             return ResponseEntity.status(400).body("Task is not in state for creating submissions.");
 
+        submissionDTO.setSubmitter(userService.convertToDto(user));
 
         var savedTask = submissionService.addTaskSubmission(taskOptional.get(), submissionService.convertToEntity(submissionDTO));
 
