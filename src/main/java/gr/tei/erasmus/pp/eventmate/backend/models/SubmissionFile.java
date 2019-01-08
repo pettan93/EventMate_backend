@@ -16,6 +16,8 @@ public class SubmissionFile {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    // todo comment
+
     private Blob content;
 
     private FileType type;

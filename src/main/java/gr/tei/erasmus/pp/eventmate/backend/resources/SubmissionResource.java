@@ -31,11 +31,31 @@ public class SubmissionResource {
     private SubmissionRepository submissionRepository;
 
 
+    @GetMapping("/task/{id}/submission/{userId}")
+    public ResponseEntity<Object> getTaskSubmissions(@PathVariable long id, @PathVariable long userId) {
+        Optional<Task> task = taskService.getById(id);
+
+        if (task.isEmpty())
+            return ResponseEntity.notFound().build();
+
+        User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+
+        if (!eventService.hasPermission(user, eventService.getParentEvent(task.get())))
+            return ResponseEntity.status(403).body("User has no permission task parent event");
+
+
+        return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body(task.get().getSubmissions().stream().filter(s -> s.getSubmitter().getId() == userId)
+                        .map(submission -> submissionService.convertToDto(submission))
+                        .collect(Collectors.toList()));
+    }
+
     /**
      * Permission: Everyone involved in parent event
      */
     @GetMapping("/task/{id}/submission")
-    public ResponseEntity<Object> getTaskSumission(@PathVariable long id) {
+    public ResponseEntity<Object> getTaskSubmissions(@PathVariable long id) {
         Optional<Task> task = taskService.getById(id);
 
         if (task.isEmpty())
@@ -98,7 +118,7 @@ public class SubmissionResource {
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
-        if (!eventService.isOwner(user, parentEvent) || !taskService.isOwner(user,parentTask))
+        if (!eventService.isOwner(user, parentEvent) || !taskService.isOwner(user, parentTask))
             return ResponseEntity.status(403).body("User has no permission for assigning points");
 
         if (!taskService.isTaskInReviewState(parentTask))
@@ -109,7 +129,7 @@ public class SubmissionResource {
 
         var submission = submissionOptional.get();
 
-        var savedTask = submissionService.assignPoints(parentTask,submission,points);
+        var savedTask = submissionService.assignPoints(parentTask, submission, points);
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(taskService.convertToDto(savedTask));
     }
