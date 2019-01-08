@@ -25,7 +25,7 @@ public class FileService {
     }
 
     public Blob getSubmissionFileContent(SubmissionFile submissionFile){
-        return submissionFile.getContent();
+        return submissionFile.getData();
     }
 
     public Blob getReportContent(Report report){

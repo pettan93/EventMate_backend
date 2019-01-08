@@ -1,5 +1,6 @@
 package gr.tei.erasmus.pp.eventmate.backend.resources;
 
+import gr.tei.erasmus.pp.eventmate.backend.DTOs.SubmissionFileDTO;
 import gr.tei.erasmus.pp.eventmate.backend.models.*;
 import gr.tei.erasmus.pp.eventmate.backend.repository.SubmissionFileRepository;
 import gr.tei.erasmus.pp.eventmate.backend.services.*;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.Blob;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 public class FileResource {
@@ -37,6 +39,7 @@ public class FileResource {
 
         Optional<SubmissionFile> submissionFile = submissionFileRepository.findById(id);
 
+
         if (submissionFile.isEmpty())
             return ResponseEntity.notFound().build();
 
@@ -45,9 +48,9 @@ public class FileResource {
         if (!submissionService.hasPermissionForSubmissionFile(user, submissionFile.get()))
             return ResponseEntity.status(403).body("You dont have permission for this file");
 
-        String data = FileUtils.getEncodedStringFromBlob(submissionFile.get().getContent());
-
-        return ResponseEntity.ok(data);
+        return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body(submissionService.convertFileToDto(submissionFile.get()));
     }
 
     /**
@@ -96,7 +99,7 @@ public class FileResource {
      * Permission: Everyone involved in event
      */
     @PostMapping("/file/report/{id}/content")
-    public ResponseEntity<Object> saveReportContent(@PathVariable long id,@RequestBody String fileString) {
+    public ResponseEntity<Object> saveReportContent(@PathVariable long id, @RequestBody String fileString) {
 
         Optional<Report> reportOptional = reportService.getReportById(id);
 
@@ -144,7 +147,7 @@ public class FileResource {
 //
 //        var report = reportOptional.get();
 //
-//        report.setContent(file);
+//        report.setData(file);
 //
 //        var savedReport = reportService.saveReport(report);
 //
@@ -155,7 +158,7 @@ public class FileResource {
      * Permission: Everyone involved in event
      */
     @PostMapping("/file/submissionFile/task/{id}")
-    public ResponseEntity<Object> uploadSubmissionForTask(@PathVariable long id, @RequestBody String fileString) {
+    public ResponseEntity<Object> uploadSubmissionForTask(@PathVariable long id, @RequestBody SubmissionFileDTO submissionFileDTO) {
 
         Optional<Task> taskOptional = taskService.getById(id);
 
@@ -167,9 +170,7 @@ public class FileResource {
         if (!submissionService.hasPermissionForSubmittion(user, taskOptional.get()))
             return ResponseEntity.status(403).body("You dont have permission submitting to this task");
 
-        Blob file = FileUtils.getBlobFromEncodedString(fileString);
-
-        var updatedTask = submissionService.submit(user, taskOptional.get(), file);
+        var updatedTask = submissionService.submit(user, taskOptional.get(), submissionFileDTO);
 
         return ResponseEntity.ok(taskService.convertToDto(updatedTask));
     }

@@ -112,7 +112,9 @@ public class StartupBean {
 
 
         var sbf = new SubmissionFile();
-        sbf.setContent(FileUtils.getFileBlob(new File("blank.jpg")));
+        sbf.setName("photo proof");
+        sbf.setComment("comment");
+        sbf.setData(FileUtils.getFileBlob(new File("blank.jpg")));
         sbf.setType(FileType.PHOTO);
         sbf.setCreated(new Date());
 
@@ -156,7 +158,7 @@ public class StartupBean {
         task2.setAssignees(Collections.singletonList(user2));
 
         var sbf2 = new SubmissionFile();
-        sbf2.setContent(FileUtils.getFileBlob(new File("blank.jpg")));
+        sbf2.setData(FileUtils.getFileBlob(new File("blank.jpg")));
         sbf2.setType(FileType.PHOTO);
         sbf2.setCreated(new Date());
 

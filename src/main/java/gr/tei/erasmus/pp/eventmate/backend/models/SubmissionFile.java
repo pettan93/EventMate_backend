@@ -16,7 +16,7 @@ public class SubmissionFile {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private Blob content;
+    private Blob data;
 
     private String name;
 
@@ -29,8 +29,8 @@ public class SubmissionFile {
     public SubmissionFile() {
     }
 
-    public SubmissionFile(Blob content, FileType type, Date created) {
-        this.content = content;
+    public SubmissionFile(Blob data, FileType type, Date created) {
+        this.data = data;
         this.type = type;
         this.created = created;
     }
@@ -43,12 +43,12 @@ public class SubmissionFile {
         this.id = id;
     }
 
-    public Blob getContent() {
-        return content;
+    public Blob getData() {
+        return data;
     }
 
-    public void setContent(Blob content) {
-        this.content = content;
+    public void setData(Blob data) {
+        this.data = data;
     }
 
     public FileType getType() {
@@ -87,7 +87,7 @@ public class SubmissionFile {
     public String toString() {
         return "SubmissionFile{" +
                 "id=" + id +
-                ", content=" + content +
+                ", data=" + data +
                 ", name='" + name + '\'' +
                 ", comment='" + comment + '\'' +
                 ", type=" + type +

@@ -16,6 +16,8 @@ public class SubmissionFileDTO {
 
     private Date created;
 
+    private String data;
+
     public Long getId() {
         return id;
     }
@@ -54,5 +56,13 @@ public class SubmissionFileDTO {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
     }
 }

@@ -2,7 +2,6 @@ package gr.tei.erasmus.pp.eventmate.backend.services;
 
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.SubmissionDTO;
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.SubmissionFileDTO;
-import gr.tei.erasmus.pp.eventmate.backend.enums.FileType;
 import gr.tei.erasmus.pp.eventmate.backend.models.Submission;
 import gr.tei.erasmus.pp.eventmate.backend.models.SubmissionFile;
 import gr.tei.erasmus.pp.eventmate.backend.models.Task;
@@ -13,7 +12,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -34,7 +32,7 @@ public class SubmissionService {
     private SubmissionRepository submissionRepository;
 
 
-    public Task submit(User user, Task task, Blob data) {
+    public Task submit(User user, Task task, SubmissionFileDTO submissionFileDTO) {
 
         var submission = getUserSubmissionForTask(task, user);
 
@@ -49,8 +47,10 @@ public class SubmissionService {
 
         var submissionFile = new SubmissionFile();
         submissionFile.setCreated(new Date());
-        submissionFile.setType(FileType.PHOTO); // TODO
-        submissionFile.setContent(data);
+        submissionFile.setName(submissionFileDTO.getName());
+        submissionFile.setComment(submissionFileDTO.getComment());
+        submissionFile.setType(submissionFileDTO.getType()); // TODO
+        submissionFile.setData(FileUtils.getBlobFromEncodedString(submissionFileDTO.getData()));
 
         submission.getContent().add(submissionFile);
 
@@ -144,8 +144,6 @@ public class SubmissionService {
         submissionDto.setMaxPoints(parentTask.getPoints().intValue());
 
         if (submission.getContent() != null && submission.getContent().size() > 0) {
-
-
             List<SubmissionFileDTO> filesDtos = submission.getContent()
                     .stream()
                     .map(this::convertFileToDto)
@@ -195,9 +193,9 @@ public class SubmissionService {
         SubmissionFileDTO submittionFileDto = modelMapper.map(submittionFile, SubmissionFileDTO.class);
 
 
-//        if (submittionFile.getContent() != null) {
-//            submittionFileDto.setContent(FileUtils.getEncodedStringFromBlob(submittionFile.getContent()));
-//        }
+        if (submittionFile.getData() != null) {
+            submittionFileDto.setData(FileUtils.getEncodedStringFromBlob(submittionFile.getData()));
+        }
 
 
         return submittionFileDto;
@@ -208,8 +206,8 @@ public class SubmissionService {
 
         SubmissionFile submissionFile = modelMapper.map(submissionFileDto, SubmissionFile.class);
 
-//        if (submissionFileDto.getContent() != null) {
-//            submissionFile.setContent(FileUtils.getBlobFromEncodedString(submissionFileDto.getContent()));
+//        if (submissionFileDto.getData() != null) {
+//            submissionFile.setData(FileUtils.getBlobFromEncodedString(submissionFileDto.getData()));
 //        }
 
 
