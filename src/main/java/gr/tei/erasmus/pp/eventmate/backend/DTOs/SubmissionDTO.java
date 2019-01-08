@@ -6,6 +6,10 @@ public class SubmissionDTO {
 
     private Long id;
 
+    private String name;
+
+    private String comment;
+
     private String taskName;
 
     private String taskPhoto;
@@ -82,5 +86,21 @@ public class SubmissionDTO {
 
     public void setTaskPhoto(String taskPhoto) {
         this.taskPhoto = taskPhoto;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }

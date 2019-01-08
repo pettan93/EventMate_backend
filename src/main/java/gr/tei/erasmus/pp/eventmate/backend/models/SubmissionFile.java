@@ -16,9 +16,11 @@ public class SubmissionFile {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    // todo comment
-
     private Blob content;
+
+    private String name;
+
+    private String comment;
 
     private FileType type;
 
@@ -65,10 +67,29 @@ public class SubmissionFile {
         this.created = created;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
     @Override
     public String toString() {
         return "SubmissionFile{" +
                 "id=" + id +
+                ", content=" + content +
+                ", name='" + name + '\'' +
+                ", comment='" + comment + '\'' +
                 ", type=" + type +
                 ", created=" + created +
                 '}';
