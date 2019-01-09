@@ -49,7 +49,7 @@ public class SubmissionService {
         submissionFile.setCreated(new Date());
         submissionFile.setName(submissionFileDTO.getName());
         submissionFile.setComment(submissionFileDTO.getComment());
-        submissionFile.setType(submissionFileDTO.getType()); // TODO
+        submissionFile.setType(submissionFileDTO.getType());
         submissionFile.setData(FileUtils.getBlobFromEncodedString(submissionFileDTO.getData()));
 
         submission.getContent().add(submissionFile);
