@@ -1,5 +1,6 @@
 package gr.tei.erasmus.pp.eventmate.backend.resources;
 
+import gr.tei.erasmus.pp.eventmate.backend.DTOs.EmailDTO;
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.ReportRequestDTO;
 import gr.tei.erasmus.pp.eventmate.backend.models.Event;
 import gr.tei.erasmus.pp.eventmate.backend.models.Report;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -36,6 +38,8 @@ public class ReportResource {
     private SubmissionService submissionService;
     @Autowired
     private ReportService reportService;
+    @Autowired
+    private EmailService emailService;
 
     /**
      * Permission: Everyone involved in event
@@ -61,6 +65,7 @@ public class ReportResource {
                 .map(reportService::convertToDto)
                 .collect(Collectors.toList()));
     }
+
 
     /**
      * Permission: Everyone involved in event
@@ -105,15 +110,24 @@ public class ReportResource {
 
         report.setReportCreator(user);
 
-        reportService.addReportToEvent(eventOptional.get(), report);
+        var editedReport = reportService.addReportToEvent(eventOptional.get(), report);
 
         // todo create pdf on server side, set preview and save it
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(reportService.getEventReports(eventOptional.get())
-                .stream()
-                .map(reportService::convertToDto)
-                .collect(Collectors.toList()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(reportService.convertToDto(editedReport));
+    }
 
+    @PostMapping("/report/{id}/share")
+    public ResponseEntity<Object> shareReport(@RequestBody EmailDTO emailDTO, @PathVariable long id) {
+
+        Optional<Report> report = reportService.getReportById(id);
+
+        if (report.isEmpty())
+            return ResponseEntity.status(404).body("No such report found");
+
+        emailService.sendMessageWithAttachment(report.get(), emailDTO);
+
+        return ResponseEntity.ok(reportService.convertToDto(report.get()));
     }
 
     @DeleteMapping("/report/{id}")
