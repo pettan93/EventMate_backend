@@ -40,7 +40,7 @@ public class ReportResource {
     /**
      * Permission: Everyone involved in event
      */
-    @GetMapping("/event/{id}/report")
+    @GetMapping("/event/{id}/reports")
     public ResponseEntity<Object> getEventByIdReports(@PathVariable long id) {
         Optional<Event> event = eventRepository.findById(id);
 
@@ -103,10 +103,32 @@ public class ReportResource {
             return ResponseEntity.status(400).body("Event is finished yet");
 
 
-        var editedReport = reportService.addReportToEvent(eventOptional.get(),report);
+        report.setReportCreator(user);
+
+        var editedReport = reportService.addReportToEvent(eventOptional.get(), report);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(reportService.convertToDto(editedReport));
 
+    }
+
+    @DeleteMapping("/report/{id}")
+    public ResponseEntity<Object> deleteTask(@PathVariable long id) {
+
+        Optional<Report> reportOptional = reportService.getReportById(id);
+
+        if (reportOptional.isEmpty())
+            return ResponseEntity.notFound().build();
+
+        User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+
+        if (!(eventService.isOwner(user, eventService.getParentEvent(reportOptional.get())) || reportService.isReportCreator(reportOptional.get(), user)))
+            return ResponseEntity.status(403).body("User doesn't have permission for deleting report");
+
+        eventService.getParentEvent(reportOptional.get()).getReports().remove(reportOptional.get());
+
+        reportService.deleteReport(reportOptional.get());
+
+        return ResponseEntity.ok().build();
     }
 
 

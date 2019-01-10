@@ -16,6 +16,8 @@ public class ReportDTO {
 
     private Date created;
 
+    private String preview;
+
 
     public Long getId() {
         return id;
@@ -55,5 +57,13 @@ public class ReportDTO {
 
     public void setCreated(Date created) {
         this.created = created;
+    }
+
+    public String getPreview() {
+        return preview;
+    }
+
+    public void setPreview(String preview) {
+        this.preview = preview;
     }
 }

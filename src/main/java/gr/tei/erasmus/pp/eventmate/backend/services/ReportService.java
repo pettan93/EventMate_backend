@@ -4,7 +4,9 @@ import gr.tei.erasmus.pp.eventmate.backend.DTOs.ReportDTO;
 import gr.tei.erasmus.pp.eventmate.backend.enums.EventState;
 import gr.tei.erasmus.pp.eventmate.backend.models.Event;
 import gr.tei.erasmus.pp.eventmate.backend.models.Report;
+import gr.tei.erasmus.pp.eventmate.backend.models.User;
 import gr.tei.erasmus.pp.eventmate.backend.repository.ReportRepository;
+import gr.tei.erasmus.pp.eventmate.backend.utils.FileUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +29,6 @@ public class ReportService {
     private EventService eventService;
 
 
-
     public Report addReportToEvent(Event e, Report report) {
 
         var savedReport = reportRepository.save(report);
@@ -38,7 +39,11 @@ public class ReportService {
         return savedReport;
     }
 
-    public Report saveReport(Report r){
+    public Boolean isReportCreator(Report report, User user) {
+        return report.getReportCreator().equals(user);
+    }
+
+    public Report saveReport(Report r) {
         return reportRepository.save(r);
     }
 
@@ -64,6 +69,15 @@ public class ReportService {
 
     public ReportDTO convertToDto(Report report) {
         ReportDTO reportDto = modelMapper.map(report, ReportDTO.class);
+
+        if (report.getPreview() != null) {
+            try {
+                reportDto.setPreview(FileUtils.getEncodedStringFromBlob(report.getPreview()));
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         return reportDto;
     }
 
@@ -72,6 +86,10 @@ public class ReportService {
         Report report = modelMapper.map(reportDto, Report.class);
         report.setContent(null);
         return report;
+    }
+
+    public void deleteReport(Report report) {
+        reportRepository.delete(report);
     }
 
 }

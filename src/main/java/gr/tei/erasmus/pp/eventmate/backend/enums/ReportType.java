@@ -8,9 +8,4 @@ public enum ReportType {
 
     private String name;
 
-    private Blob icon;
-
-    private Blob template;
-
-
 }

@@ -16,10 +16,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
+import java.util.*;
 
 @Component
 public class StartupBean {
@@ -143,7 +140,6 @@ public class StartupBean {
         event2.setGuests(Arrays.asList(user1, user3, user4));
 
 
-
         var task2 = new Task(
                 "Kiss your crush",
                 "Ampfitear",
@@ -174,14 +170,24 @@ public class StartupBean {
         report.setCreated(new Date());
         report.setName("Report 1");
         report.setType(ReportType.CERTIFICATE);
+        report.setReportCreator(user1);
         report.setPreview(FileUtils.getFileBlob(new File("blank.jpg")));
         report.setContent(FileUtils.getFileBlob(new File("blank.jpg")));
 
-        event2.setTasks(Collections.singletonList(task2));
-        event2.setReports(Collections.singletonList(report));
+
+        var report2 = new Report();
+        report2.setComment("Report to be deleted");
+        report2.setCreated(new Date());
+        report2.setName("Report 2");
+        report2.setReportCreator(user3);
+        report2.setType(ReportType.CERTIFICATE);
+        report2.setPreview(FileUtils.getFileBlob(new File("blank.jpg")));
+        report2.setContent(FileUtils.getFileBlob(new File("blank.jpg")));
+
+
+        event2.setReports(List.of(report, report2));
 
         eventRepository.save(event2);
-
 
 
     }

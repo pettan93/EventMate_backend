@@ -26,6 +26,8 @@ public class Report {
 
     private Blob preview;
 
+    @OneToOne
+    private User reportCreator;
 
     public Report() {
     }
@@ -93,5 +95,13 @@ public class Report {
 
     public void setPreview(Blob preview) {
         this.preview = preview;
+    }
+
+    public User getReportCreator() {
+        return reportCreator;
+    }
+
+    public void setReportCreator(User reportCreator) {
+        this.reportCreator = reportCreator;
     }
 }
