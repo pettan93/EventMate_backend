@@ -1,5 +1,6 @@
 package gr.tei.erasmus.pp.eventmate.backend.services;
 
+import gr.tei.erasmus.pp.eventmate.backend.DTOs.PlainTaskDTO;
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.TaskDTO;
 import gr.tei.erasmus.pp.eventmate.backend.enums.TaskState;
 import gr.tei.erasmus.pp.eventmate.backend.models.Task;
@@ -97,6 +98,20 @@ public class TaskService {
 
     public List<Task> getAllTasks(){
         return taskRepository.findAll();
+    }
+
+    public PlainTaskDTO convertToPlainTaskDto(Task task) {
+        PlainTaskDTO taskDto = modelMapper.map(task, PlainTaskDTO.class);
+
+        if (task.getPhoto() != null) {
+            try {
+                taskDto.setPhoto(FileUtils.getEncodedStringFromBlob(task.getPhoto()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return taskDto;
     }
 
 

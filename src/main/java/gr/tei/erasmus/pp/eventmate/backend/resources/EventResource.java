@@ -75,6 +75,28 @@ public class EventResource {
 
 
     /**
+     * Permission: Everyone involved in event
+     */
+    @GetMapping("/event/{id}/tasks")
+    public ResponseEntity<Object> getEventTasksById(@PathVariable long id) {
+        Optional<Event> event = eventRepository.findById(id);
+
+        if (event.isEmpty())
+            return ResponseEntity.notFound().build();
+
+        User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+
+        if (!eventService.hasPermission(user, event.get()))
+            return ResponseEntity.status(403).build();
+
+        return ResponseEntity.ok(event.get().getTasks()
+                .stream()
+                .map(taskService::convertToPlainTaskDto)
+                .collect(Collectors.toList()));
+    }
+
+
+    /**
      * Permission: Everyone
      */
     @PostMapping("/event")
@@ -82,7 +104,7 @@ public class EventResource {
 
         Event event = eventService.convertToEntity(eventDto);
 
-        if(eventService.isNameUsed(event.getName()))
+        if (eventService.isNameUsed(event.getName()))
             return ResponseEntity.status(400).body("Eventname is already used");
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
