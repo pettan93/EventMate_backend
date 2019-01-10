@@ -19,7 +19,7 @@ public class EventDTO {
 
     private EventState state;
 
-    private List<ReportDTO> reports;
+    private List<ReportResponseDTO> reports;
 
     private List<InvitationDTO> invitations;
 
@@ -147,11 +147,11 @@ public class EventDTO {
         this.state = state;
     }
 
-    public List<ReportDTO> getReports() {
+    public List<ReportResponseDTO> getReports() {
         return reports;
     }
 
-    public void setReports(List<ReportDTO> reports) {
+    public void setReports(List<ReportResponseDTO> reports) {
         this.reports = reports;
     }
 

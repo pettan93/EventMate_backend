@@ -1,6 +1,5 @@
 package gr.tei.erasmus.pp.eventmate.backend.resources;
 
-import gr.tei.erasmus.pp.eventmate.backend.DTOs.ReportDTO;
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.ReportRequestDTO;
 import gr.tei.erasmus.pp.eventmate.backend.models.Event;
 import gr.tei.erasmus.pp.eventmate.backend.models.Report;

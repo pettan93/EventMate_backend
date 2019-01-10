@@ -4,7 +4,7 @@ import gr.tei.erasmus.pp.eventmate.backend.enums.ReportType;
 
 import java.util.Date;
 
-public class ReportDTO {
+public class ReportResponseDTO {
 
     private Long id;
 

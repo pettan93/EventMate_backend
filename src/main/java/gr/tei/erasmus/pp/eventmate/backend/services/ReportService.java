@@ -1,6 +1,6 @@
 package gr.tei.erasmus.pp.eventmate.backend.services;
 
-import gr.tei.erasmus.pp.eventmate.backend.DTOs.ReportDTO;
+import gr.tei.erasmus.pp.eventmate.backend.DTOs.ReportResponseDTO;
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.ReportRequestDTO;
 import gr.tei.erasmus.pp.eventmate.backend.enums.EventState;
 import gr.tei.erasmus.pp.eventmate.backend.models.Event;
@@ -69,8 +69,8 @@ public class ReportService {
         return e.getState().equals(EventState.FINISHED);
     }
 
-    public ReportDTO convertToDto(Report report) {
-        ReportDTO reportDto = modelMapper.map(report, ReportDTO.class);
+    public ReportResponseDTO convertToDto(Report report) {
+        ReportResponseDTO reportDto = modelMapper.map(report, ReportResponseDTO.class);
 
         if (report.getPreview() != null) {
             try {
@@ -90,7 +90,7 @@ public class ReportService {
         return report;
     }
 
-    public Report convertToEntity(ReportDTO reportDto) {
+    public Report convertToEntity(ReportResponseDTO reportDto) {
         Report report = modelMapper.map(reportDto, Report.class);
         report.setContent(null);
         return report;
