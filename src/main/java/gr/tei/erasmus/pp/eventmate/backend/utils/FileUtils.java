@@ -1,14 +1,27 @@
 package gr.tei.erasmus.pp.eventmate.backend.utils;
 
 import javax.sql.rowset.serial.SerialBlob;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.Base64;
 
 public class FileUtils {
+
+    public static File getFileFromBlob(Blob blob, File tempFile) {
+        try {
+            InputStream in = blob.getBinaryStream();
+            OutputStream out = new FileOutputStream(tempFile);
+            byte[] buff = blob.getBytes(1, (int) blob.length());
+            out.write(buff);
+            out.close();
+        } catch (IOException | SQLException e) {
+            e.printStackTrace();
+        }
+
+        return tempFile;
+    }
 
 
     public static Blob getFileBlob(File f) {

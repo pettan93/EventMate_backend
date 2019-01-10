@@ -4,6 +4,7 @@ import gr.tei.erasmus.pp.eventmate.backend.DTOs.EmailDTO;
 import gr.tei.erasmus.pp.eventmate.backend.models.Report;
 import gr.tei.erasmus.pp.eventmate.backend.models.User;
 import gr.tei.erasmus.pp.eventmate.backend.models.UserPrincipal;
+import gr.tei.erasmus.pp.eventmate.backend.utils.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.SimpleMailMessage;
@@ -18,6 +19,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -44,12 +46,15 @@ public class EmailService {
             helper.setSubject(emailDTO.getSubject());
             helper.setText(emailDTO.getText());
 
-//            FileSystemResource file
-//                    = new FileSystemResource(new File(pathToAttachment));
-//            helper.addAttachment("Invoice", file);
+            // todo change to pdf
+            File tempFile = File.createTempFile(report.getName() + ".jpg", ".jpg");
+
+            helper.addAttachment(report.getName(), FileUtils.getFileFromBlob(report.getContent(), tempFile));
+
+            tempFile.deleteOnExit();
 
             emailSender.send(message);
-        } catch (MessagingException e) {
+        } catch (MessagingException | IOException e) {
             e.printStackTrace();
         }
 
