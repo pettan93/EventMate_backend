@@ -112,7 +112,7 @@ public class ReportResource {
     }
 
     @DeleteMapping("/report/{id}")
-    public ResponseEntity<Object> deleteTask(@PathVariable long id) {
+    public ResponseEntity<Object> deleteReport(@PathVariable long id) {
 
         Optional<Report> reportOptional = reportService.getReportById(id);
 
@@ -124,11 +124,15 @@ public class ReportResource {
         if (!(eventService.isOwner(user, eventService.getParentEvent(reportOptional.get())) || reportService.isReportCreator(reportOptional.get(), user)))
             return ResponseEntity.status(403).body("User doesn't have permission for deleting report");
 
-        eventService.getParentEvent(reportOptional.get()).getReports().remove(reportOptional.get());
+        var parentEvent = eventService.getParentEvent(reportOptional.get());
+        parentEvent.getReports().remove(reportOptional.get());
 
         reportService.deleteReport(reportOptional.get());
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(reportService.getEventReports(parentEvent)
+                .stream()
+                .map(reportService::convertToDto)
+                .collect(Collectors.toList()));
     }
 
 

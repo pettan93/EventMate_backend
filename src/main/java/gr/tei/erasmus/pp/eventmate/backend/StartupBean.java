@@ -184,8 +184,26 @@ public class StartupBean {
         report2.setPreview(FileUtils.getFileBlob(new File("blank.jpg")));
         report2.setContent(FileUtils.getFileBlob(new File("blank.jpg")));
 
+        var report3 = new Report();
+        report3.setComment("Report to be deleted");
+        report3.setCreated(new Date());
+        report3.setName("Report 3");
+        report3.setReportCreator(user3);
+        report3.setType(ReportType.CERTIFICATE);
+        report3.setPreview(FileUtils.getFileBlob(new File("blank.jpg")));
+        report3.setContent(FileUtils.getFileBlob(new File("blank.jpg")));
 
-        event2.setReports(List.of(report, report2));
+        var report4 = new Report();
+        report4.setComment("Report to be deleted");
+        report4.setCreated(new Date());
+        report4.setName("Report 4");
+        report4.setReportCreator(user3);
+        report4.setType(ReportType.CERTIFICATE);
+        report4.setPreview(FileUtils.getFileBlob(new File("blank.jpg")));
+        report4.setContent(FileUtils.getFileBlob(new File("blank.jpg")));
+
+
+        event2.setReports(List.of(report, report2, report3, report4));
 
         eventRepository.save(event2);
 
