@@ -1,6 +1,7 @@
 package gr.tei.erasmus.pp.eventmate.backend.resources;
 
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.ReportDTO;
+import gr.tei.erasmus.pp.eventmate.backend.DTOs.ReportRequestDTO;
 import gr.tei.erasmus.pp.eventmate.backend.models.Event;
 import gr.tei.erasmus.pp.eventmate.backend.models.Report;
 import gr.tei.erasmus.pp.eventmate.backend.models.User;
@@ -85,7 +86,7 @@ public class ReportResource {
      * Permission: Everyone involved in event
      */
     @PostMapping("/event/{id}/report")
-    public ResponseEntity<Object> addReportToEvent(@RequestBody ReportDTO reportDTO, @PathVariable long id) {
+    public ResponseEntity<Object> addReportToEvent(@RequestBody ReportRequestDTO reportDTO, @PathVariable long id) {
 
         Report report = reportService.convertToEntity(reportDTO);
 
@@ -105,9 +106,14 @@ public class ReportResource {
 
         report.setReportCreator(user);
 
-        var editedReport = reportService.addReportToEvent(eventOptional.get(), report);
+        reportService.addReportToEvent(eventOptional.get(), report);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(reportService.convertToDto(editedReport));
+        // todo create pdf on server side, set preview and save it
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(reportService.getEventReports(eventOptional.get())
+                .stream()
+                .map(reportService::convertToDto)
+                .collect(Collectors.toList()));
 
     }
 

@@ -1,6 +1,7 @@
 package gr.tei.erasmus.pp.eventmate.backend.services;
 
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.ReportDTO;
+import gr.tei.erasmus.pp.eventmate.backend.DTOs.ReportRequestDTO;
 import gr.tei.erasmus.pp.eventmate.backend.enums.EventState;
 import gr.tei.erasmus.pp.eventmate.backend.models.Event;
 import gr.tei.erasmus.pp.eventmate.backend.models.Report;
@@ -11,6 +12,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -81,6 +83,12 @@ public class ReportService {
         return reportDto;
     }
 
+    public Report convertToEntity(ReportRequestDTO reportRequestDTO) {
+        Report report = modelMapper.map(reportRequestDTO, Report.class);
+        report.setContent(null);
+        report.setCreated(new Date());
+        return report;
+    }
 
     public Report convertToEntity(ReportDTO reportDto) {
         Report report = modelMapper.map(reportDto, Report.class);
