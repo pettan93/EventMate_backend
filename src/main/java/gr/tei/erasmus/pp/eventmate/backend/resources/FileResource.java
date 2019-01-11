@@ -175,6 +175,26 @@ public class FileResource {
         return ResponseEntity.ok(taskService.convertToDto(updatedTask));
     }
 
-    // todo delete submissionFile
+    @DeleteMapping("/file/submissionFile/{id}")
+    public ResponseEntity<Object> deleteSubmissionFile(@PathVariable long id) {
+
+        Optional<SubmissionFile> submissionFileOptional = submissionService.getSubmissionFileById(id);
+
+        if (submissionFileOptional.isEmpty())
+            return ResponseEntity.notFound().build();
+
+
+        User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+
+        if (!submissionService.hasPermissionForSubmissionFile(user, submissionFileOptional.get()))
+            return ResponseEntity.status(403).body("You dont have permission to handle submission file");
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(submissionService.getParentTaskOfSubmissionFile(submissionFileOptional.get()).
+                        getSubmissions().stream().filter(s -> s.getSubmitter().getId().equals(user.getId()))
+                        .map(submission -> submissionService.convertToDto(submission))
+                        .collect(Collectors.toList()));
+    }
 
 }

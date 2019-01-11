@@ -6,6 +6,7 @@ import gr.tei.erasmus.pp.eventmate.backend.models.Submission;
 import gr.tei.erasmus.pp.eventmate.backend.models.SubmissionFile;
 import gr.tei.erasmus.pp.eventmate.backend.models.Task;
 import gr.tei.erasmus.pp.eventmate.backend.models.User;
+import gr.tei.erasmus.pp.eventmate.backend.repository.SubmissionFileRepository;
 import gr.tei.erasmus.pp.eventmate.backend.repository.SubmissionRepository;
 import gr.tei.erasmus.pp.eventmate.backend.utils.FileUtils;
 import org.modelmapper.ModelMapper;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,6 +32,8 @@ public class SubmissionService {
     private EventService eventService;
     @Autowired
     private SubmissionRepository submissionRepository;
+    @Autowired
+    private SubmissionFileRepository submissionFileRepository;
 
 
     public Task submit(User user, Task task, SubmissionFileDTO submissionFileDTO) {
@@ -67,8 +71,7 @@ public class SubmissionService {
 
     public Boolean hasPermissionForSubmissionFile(User user, SubmissionFile submissionFile) {
 
-        var submissions = submissionRepository.findAll()
-                .stream()
+        var submissions = submissionRepository.findAll().stream()
                 .filter(submission -> submission.getContent() != null && submission.getContent().contains(submissionFile))
                 .collect(Collectors.toList());
 
@@ -212,6 +215,20 @@ public class SubmissionService {
 
 
         return submissionFile;
+    }
+
+    public Optional<SubmissionFile> getSubmissionFileById(Long id) {
+        return submissionFileRepository.findById(id);
+    }
+
+    public Task getParentTaskOfSubmissionFile(SubmissionFile submissionFile) {
+
+        var submissionOptional = submissionRepository.findSubmissionByFile(submissionFile);
+        if (submissionOptional.isPresent()) {
+            return getParentTask(submissionOptional.get());
+        }
+
+        return null;
     }
 
 

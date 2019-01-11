@@ -54,30 +54,6 @@ public class SubmissionResource {
                         .collect(Collectors.toList()));
     }
 
-    /**
-     * Permission: Everyone involved in parent event
-     */
-    @GetMapping("/task/{id}/submission")
-    public ResponseEntity<Object> getTaskSubmissions(@PathVariable long id) {
-        Optional<Task> task = taskService.getById(id);
-
-        if (task.isEmpty())
-            return ResponseEntity.notFound().build();
-
-        User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
-
-
-        if (!eventService.hasPermission(user, eventService.getParentEvent(task.get())))
-            return ResponseEntity.status(403).body("User has no permission task parent event");
-
-        return ResponseEntity
-                .status(HttpStatus.ACCEPTED)
-                .body(task.get().getSubmissions()
-                        .stream()
-                        .map(submission -> submissionService.convertToDto(submission))
-                        .collect(Collectors.toList()));
-    }
-
 
     /**
      * Permission: Task Assignees

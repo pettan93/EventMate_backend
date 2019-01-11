@@ -119,7 +119,15 @@ public class StartupBean {
         submission1.setSubmitter(user2);
         submission1.setContent(Arrays.asList(sbf));
 
-        task1.setSubmissions(Arrays.asList(submission1));
+        var submission2 = new Submission();
+        submission2.setSubmitter(user2);
+        submission2.setContent(Arrays.asList(sbf));
+
+        var submission3 = new Submission();
+        submission3.setSubmitter(user2);
+        submission3.setContent(Arrays.asList(sbf));
+
+        task1.setSubmissions(Arrays.asList(submission1, submission2, submission3));
 
         event1.getTasks().add(task1);
 
@@ -158,12 +166,12 @@ public class StartupBean {
         sbf2.setType(FileType.PHOTO);
         sbf2.setCreated(new Date());
 
-        var submission2 = new Submission();
-        submission1.setSubmitter(user2);
-        submission1.setContent(Collections.singletonList(sbf2));
-        submission1.setEarnedPoints(40);
+        var submission4 = new Submission();
+        submission4.setSubmitter(user2);
+        submission4.setContent(Collections.singletonList(sbf2));
+        submission4.setEarnedPoints(40);
 
-        submission2.setContent(Collections.singletonList(sbf2));
+        submission4.setContent(Collections.singletonList(sbf2));
 
         var report = new Report();
         report.setComment("Prvni report, dost cool");
