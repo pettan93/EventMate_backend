@@ -118,16 +118,16 @@ public class StartupBean {
         var submission1 = new Submission();
         submission1.setSubmitter(user2);
         submission1.setContent(Arrays.asList(sbf));
+//
+//        var submission2 = new Submission();
+//        submission2.setSubmitter(user2);
+//        submission2.setContent(Arrays.asList(sbf));
+//
+//        var submission3 = new Submission();
+//        submission3.setSubmitter(user2);
+//        submission3.setContent(Arrays.asList(sbf));
 
-        var submission2 = new Submission();
-        submission2.setSubmitter(user2);
-        submission2.setContent(Arrays.asList(sbf));
-
-        var submission3 = new Submission();
-        submission3.setSubmitter(user2);
-        submission3.setContent(Arrays.asList(sbf));
-
-        task1.setSubmissions(Arrays.asList(submission1, submission2, submission3));
+        task1.setSubmissions(Arrays.asList(submission1));
 
         event1.getTasks().add(task1);
 

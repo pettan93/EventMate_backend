@@ -8,6 +8,7 @@ public class UserPublicDTO {
 
     private String photo;
 
+    private String email;
 
 
     public Long getId() {
@@ -32,5 +33,13 @@ public class UserPublicDTO {
 
     public void setPhoto(String photo) {
         this.photo = photo;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }
