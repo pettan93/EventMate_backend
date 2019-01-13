@@ -157,10 +157,10 @@ public class FileResource {
             return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_SUBMISSION_FILE.statusCode);
 
 
+
         var parentSubmission = submissionService.getParentSubmission(submissionFileOptional.get());
 
         parentSubmission.getContent().remove(submissionFileOptional.get());
-
 
         submissionService.saveSubmission(parentSubmission);
 
