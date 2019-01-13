@@ -2,10 +2,7 @@ package gr.tei.erasmus.pp.eventmate.backend.services;
 
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.SubmissionDTO;
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.SubmissionFileDTO;
-import gr.tei.erasmus.pp.eventmate.backend.models.Submission;
-import gr.tei.erasmus.pp.eventmate.backend.models.SubmissionFile;
-import gr.tei.erasmus.pp.eventmate.backend.models.Task;
-import gr.tei.erasmus.pp.eventmate.backend.models.User;
+import gr.tei.erasmus.pp.eventmate.backend.models.*;
 import gr.tei.erasmus.pp.eventmate.backend.repository.SubmissionFileRepository;
 import gr.tei.erasmus.pp.eventmate.backend.repository.SubmissionRepository;
 import gr.tei.erasmus.pp.eventmate.backend.utils.FileUtils;
@@ -35,6 +32,24 @@ public class SubmissionService {
     @Autowired
     private SubmissionFileRepository submissionFileRepository;
 
+
+    public void assignPoints(Task task, List<UserSubmissionPoints> points) {
+
+        for (UserSubmissionPoints point : points) {
+            var user = userService.getUserById(point.getIdUser());
+
+            if (user == null) {
+                continue;
+            }
+            var submission = getUserSubmissionForTask(task, user);
+
+            if (submission != null) {
+                submission.setEarnedPoints((int) point.getPoints());
+                submissionRepository.save(submission);
+            }
+        }
+
+    }
 
     public Task submit(User user, Task task, SubmissionFileDTO submissionFileDTO) {
 

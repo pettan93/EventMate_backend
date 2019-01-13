@@ -2,6 +2,7 @@ package gr.tei.erasmus.pp.eventmate.backend.resources;
 
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.EmailDTO;
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.ReportRequestDTO;
+import gr.tei.erasmus.pp.eventmate.backend.enums.ErrorType;
 import gr.tei.erasmus.pp.eventmate.backend.models.Event;
 import gr.tei.erasmus.pp.eventmate.backend.models.Report;
 import gr.tei.erasmus.pp.eventmate.backend.models.User;
@@ -48,16 +49,16 @@ public class ReportResource {
         Optional<Event> event = eventRepository.findById(id);
 
         if (event.isEmpty())
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!eventService.hasPermission(user, event.get()))
-            return ResponseEntity.status(403).build();
+            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode);
 
 
         if (!reportService.hasEventAnyReports(event.get()))
-            return ResponseEntity.status(403).body("Event has no reports yet");
+            return ResponseEntity.status(400).body(ErrorType.NO_REPORTS_IN_EVENT.statusCode);
 
         return ResponseEntity.ok(reportService.getEventReports(event.get())
                 .stream()
@@ -74,12 +75,12 @@ public class ReportResource {
         Optional<Report> report = reportService.getReportById(id);
 
         if (report.isEmpty())
-            return ResponseEntity.status(404).body("No such report found");
+            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!eventService.hasPermission(user, eventService.getParentEvent(report.get())))
-            return ResponseEntity.status(403).body("Use dont have permission for read given report");
+            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode);
 
         return ResponseEntity.ok(reportService.convertToDto(report.get()));
     }
@@ -96,16 +97,15 @@ public class ReportResource {
         Optional<Event> eventOptional = eventRepository.findById(id);
 
         if (eventOptional.isEmpty())
-            return ResponseEntity.status(404).body("No such event found");
+            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!eventService.hasPermission(user, eventOptional.get()))
-            return ResponseEntity.status(403).body("User dont have permission for event");
+            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode);
 
         if (!reportService.isEventInReportableState(eventOptional.get()))
-            return ResponseEntity.status(400).body("Event is not finished yet");
-
+            return ResponseEntity.status(400).body(ErrorType.EVENT_NOT_IN_FINISHED_STATE.statusCode);
 
         report.setContent(reportService.generateReport(reportDTO,eventOptional.get(),user));
         report.setReportCreator(user);
@@ -122,7 +122,7 @@ public class ReportResource {
         Optional<Report> report = reportService.getReportById(id);
 
         if (report.isEmpty())
-            return ResponseEntity.status(404).body("No such report found");
+            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
 
         emailService.sendMessageWithAttachment(report.get(), emailDTO);
 
@@ -135,12 +135,12 @@ public class ReportResource {
         Optional<Report> reportOptional = reportService.getReportById(id);
 
         if (reportOptional.isEmpty())
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!(eventService.isOwner(user, eventService.getParentEvent(reportOptional.get())) || reportService.isReportCreator(reportOptional.get(), user)))
-            return ResponseEntity.status(403).body("User doesn't have permission for deleting report");
+            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_DELETE_REPORT.statusCode);
 
         var parentEvent = eventService.getParentEvent(reportOptional.get());
         parentEvent.getReports().remove(reportOptional.get());

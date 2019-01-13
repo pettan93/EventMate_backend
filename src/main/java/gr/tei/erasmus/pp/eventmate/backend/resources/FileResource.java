@@ -1,6 +1,7 @@
 package gr.tei.erasmus.pp.eventmate.backend.resources;
 
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.SubmissionFileDTO;
+import gr.tei.erasmus.pp.eventmate.backend.enums.ErrorType;
 import gr.tei.erasmus.pp.eventmate.backend.models.*;
 import gr.tei.erasmus.pp.eventmate.backend.repository.SubmissionFileRepository;
 import gr.tei.erasmus.pp.eventmate.backend.services.*;
@@ -41,12 +42,12 @@ public class FileResource {
 
 
         if (submissionFile.isEmpty())
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!submissionService.hasPermissionForSubmissionFile(user, submissionFile.get()))
-            return ResponseEntity.status(403).body("You dont have permission for this file");
+            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION.statusCode);
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
@@ -62,12 +63,12 @@ public class FileResource {
         Optional<Report> report = reportService.getReportById(id);
 
         if (report.isEmpty())
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!eventService.hasPermission(user, eventService.getParentEvent(report.get())))
-            return ResponseEntity.status(403).body("Use dont have permission for read given report");
+            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode);
 
         String data = FileUtils.getEncodedStringFromBlob(report.get().getContent());
 
@@ -83,12 +84,12 @@ public class FileResource {
         Optional<Report> report = reportService.getReportById(id);
 
         if (report.isEmpty())
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!eventService.hasPermission(user, eventService.getParentEvent(report.get())))
-            return ResponseEntity.status(403).body("Use dont have permission for read given report");
+            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode);
 
         String data = FileUtils.getEncodedStringFromBlob(report.get().getPreview());
 
@@ -104,12 +105,12 @@ public class FileResource {
         Optional<Report> reportOptional = reportService.getReportById(id);
 
         if (reportOptional.isEmpty())
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!eventService.hasPermission(user, eventService.getParentEvent(reportOptional.get())))
-            return ResponseEntity.status(403).body("User dont have permission for read given report");
+            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode);
 
         Blob file = FileUtils.getBlobFromEncodedString(fileString);
 
@@ -124,51 +125,19 @@ public class FileResource {
         return ResponseEntity.status(HttpStatus.CREATED).body(reportService.convertToDto(savedReport));
     }
 
-//    /**
-//     * Permission: Everyone involved in event
-//     */
-//    @PostMapping("/file/report/{id}/preview")
-//    public ResponseEntity<Object> saveReportPreview(@PathVariable long id,@RequestBody String fileString) {
-//
-//        Optional<Report> reportOptional = reportService.getReportById(id);
-//
-//        if (reportOptional.isEmpty())
-//            return ResponseEntity.notFound().build();
-//
-//        User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
-//
-//        if (!eventService.hasPermission(user, eventService.getParentEvent(reportOptional.get())))
-//            return ResponseEntity.status(403).body("User dont have permission for read given report");
-//
-//        Blob file = FileUtils.getBlobFromEncodedString(fileString);
-//
-//
-//        reportOptional.get().setPreview(file);
-//
-//        var report = reportOptional.get();
-//
-//        report.setData(file);
-//
-//        var savedReport = reportService.saveReport(report);
-//
-//        return ResponseEntity.status(HttpStatus.CREATED).body(reportService.convertToDto(savedReport));
-//    }
 
-    /**
-     * Permission: Everyone involved in event
-     */
     @PostMapping("/file/submissionFile/task/{id}")
     public ResponseEntity<Object> uploadSubmissionForTask(@PathVariable long id, @RequestBody SubmissionFileDTO submissionFileDTO) {
 
         Optional<Task> taskOptional = taskService.getById(id);
 
         if (taskOptional.isEmpty())
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!submissionService.hasPermissionForSubmittion(user, taskOptional.get()))
-            return ResponseEntity.status(403).body("You dont have permission submitting to this task");
+            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_SEND_SUBMISSION.statusCode);
 
         var updatedTask = submissionService.submit(user, taskOptional.get(), submissionFileDTO);
 
@@ -181,13 +150,13 @@ public class FileResource {
         Optional<SubmissionFile> submissionFileOptional = submissionService.getSubmissionFileById(id);
 
         if (submissionFileOptional.isEmpty())
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
 
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!submissionService.hasPermissionForSubmissionFile(user, submissionFileOptional.get()))
-            return ResponseEntity.status(403).body("You dont have permission to handle submission file");
+            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_SUBMISSION_FILE.statusCode);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

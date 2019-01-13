@@ -1,5 +1,6 @@
 package gr.tei.erasmus.pp.eventmate.backend.resources;
 
+import gr.tei.erasmus.pp.eventmate.backend.enums.ErrorType;
 import gr.tei.erasmus.pp.eventmate.backend.models.Event;
 import gr.tei.erasmus.pp.eventmate.backend.models.Invitation;
 import gr.tei.erasmus.pp.eventmate.backend.models.User;
@@ -32,12 +33,6 @@ public class InvitationResource {
     @Autowired
     private EventRepository eventRepository;
 
-
-
-
-    // TODO /me/invitations
-
-
     /**
      * Permission: Everyone involved in event
      */
@@ -47,12 +42,12 @@ public class InvitationResource {
         Optional<Event> eventOptional = eventRepository.findById(id);
 
         if (eventOptional.isEmpty())
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!eventService.hasPermission(user, eventOptional.get()))
-            return ResponseEntity.status(403).build();
+            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode);
 
         eventService.addInvitations(eventOptional.get(), invitations);
 
@@ -68,12 +63,12 @@ public class InvitationResource {
         Optional<Event> eventOptional = eventRepository.findById(id);
 
         if (eventOptional.isEmpty())
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!eventService.hasPermission(user, eventOptional.get()))
-            return ResponseEntity.status(403).build();
+            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode);
 
         eventService.addInvitation(eventOptional.get(), invitation);
 

@@ -102,7 +102,7 @@ public class StartupBean {
 
         task1.setPhoto(FileUtils.getFileBlob(new File("blank.jpg")));
 
-        task1.setTaskState(TaskState.IN_PLAY);
+        task1.setTaskState(TaskState.IN_REVIEW);
 
         task1.setTaskOwner(user1);
         task1.setAssignees(Arrays.asList(user2, user3));

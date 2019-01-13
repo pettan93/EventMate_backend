@@ -1,6 +1,7 @@
 package gr.tei.erasmus.pp.eventmate.backend.resources;
 
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.TaskDTO;
+import gr.tei.erasmus.pp.eventmate.backend.enums.ErrorType;
 import gr.tei.erasmus.pp.eventmate.backend.models.Task;
 import gr.tei.erasmus.pp.eventmate.backend.models.User;
 import gr.tei.erasmus.pp.eventmate.backend.models.UserPrincipal;
@@ -42,13 +43,16 @@ public class TaskResource {
         Optional<Task> task = taskRepository.findById(id);
 
         if (task.isEmpty())
-            return ResponseEntity.notFound().build();
-
+            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!eventService.hasPermission(user, eventService.getParentEvent(task.get())))
-            return ResponseEntity.status(403).build();
+            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode);
+
+
+        if (!taskService.hasPermission(user, task.get()))
+            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_TASK.statusCode);
 
         return ResponseEntity.ok(taskService.convertToDto(task.get()));
     }
@@ -62,16 +66,15 @@ public class TaskResource {
         Optional<Task> taskOptional = taskRepository.findById(id);
 
         if (taskOptional.isEmpty())
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!taskService.isOwner(user, taskOptional.get()) || !eventService.isOwner(user,eventService.getParentEvent(taskOptional.get())))
-            return ResponseEntity.status(403).build();
+            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_EDIT_TASK.statusCode);
 
 
         eventService.getParentEvent(taskOptional.get()).getTasks().remove(taskOptional.get());
-
 
         taskService.deleteTask(taskOptional.get());
 
@@ -89,12 +92,12 @@ public class TaskResource {
         Optional<Task> taskOptional = taskRepository.findById(id);
 
         if (taskOptional.isEmpty())
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!taskService.isOwner(user, taskOptional.get()) || !eventService.isOwner(user,eventService.getParentEvent(taskOptional.get())))
-            return ResponseEntity.status(403).build();
+            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_EDIT_TASK.statusCode);
 
 
         Task updatedTask = taskService.updateTask(taskOptional.get().getId(), task);
@@ -112,12 +115,12 @@ public class TaskResource {
         Optional<Task> taskOptional = taskRepository.findById(id);
 
         if (taskOptional.isEmpty())
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!taskService.isOwner(user, taskOptional.get()))
-            return ResponseEntity.status(403).build();
+            return ResponseEntity.status(400).body(ErrorType.USER_NOT_EVENT_OWNER.statusCode);
 
 
         Task savedTask = taskService.pushTaskState(taskOptional.get());

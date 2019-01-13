@@ -51,13 +51,10 @@ public class TaskService {
     }
 
 
-    public Boolean isTaskInSubmissionState(Task task){
-        return task.getTaskState().equals(TaskState.IN_PLAY);
+    public Boolean isTaskInState(Task task,TaskState state){
+        return task.getTaskState().equals(state);
     }
 
-    public Boolean isTaskInReviewState(Task task){
-        return task.getTaskState().equals(TaskState.IN_REVIEW);
-    }
 
     public Boolean isUserAssignee(Task task, User user){
         return task.getAssignees().contains(user);

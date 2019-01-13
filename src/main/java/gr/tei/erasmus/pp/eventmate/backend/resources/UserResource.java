@@ -1,6 +1,7 @@
 package gr.tei.erasmus.pp.eventmate.backend.resources;
 
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.UserDTO;
+import gr.tei.erasmus.pp.eventmate.backend.enums.ErrorType;
 import gr.tei.erasmus.pp.eventmate.backend.enums.InvitationState;
 import gr.tei.erasmus.pp.eventmate.backend.models.Event;
 import gr.tei.erasmus.pp.eventmate.backend.models.Task;
@@ -41,7 +42,7 @@ public class UserResource {
     public ResponseEntity<Object> registerNewUser(@RequestBody UserDTO user) {
 
         if(userService.isEmailUsed(user.getEmail()))
-            return ResponseEntity.status(400).body("User email is already used");
+            return ResponseEntity.status(400).body(ErrorType.EMAIL_ALREADY_USED.statusCode);
 
         User newUser = userService.register(userService.convertToEntity(user));
 
@@ -74,6 +75,9 @@ public class UserResource {
     public ResponseEntity<Object> getUserDetail(@PathVariable long id) {
 
         User user = userService.getUserById(id);
+
+        if(user == null)
+            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
@@ -144,19 +148,20 @@ public class UserResource {
         Optional<Task> task = taskService.getById(id);
 
         if (task.isEmpty())
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
+
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
 
         if (!eventService.hasPermission(user, eventService.getParentEvent(task.get())))
-            return ResponseEntity.status(403).body("User has no permission task parent event");
+            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode);
 
 
         var submission = submissionService.getUserSubmissionForTask(task.get(),user);
 
         if(submission == null)
-            return ResponseEntity.status(404).body("No submission for current user");
+            return ResponseEntity.status(400).body(ErrorType.NO_SUBMISSION.statusCode);
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
@@ -174,9 +179,7 @@ public class UserResource {
         var result = taskService.getUserTasks(user);
 
         if (event.isEmpty() || result.isEmpty())
-            return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .build();
+            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
