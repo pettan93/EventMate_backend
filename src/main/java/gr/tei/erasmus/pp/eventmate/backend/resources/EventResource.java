@@ -95,7 +95,7 @@ public class EventResource {
 
         return ResponseEntity.ok(event.get().getTasks()
                 .stream()
-                .map(taskService::convertToPlainTaskDto)
+                .map(taskService::convertToDto)
                 .collect(Collectors.toList()));
     }
 
