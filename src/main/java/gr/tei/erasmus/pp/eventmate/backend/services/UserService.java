@@ -1,6 +1,7 @@
 package gr.tei.erasmus.pp.eventmate.backend.services;
 
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.UserDTO;
+import gr.tei.erasmus.pp.eventmate.backend.DTOs.UserLightDTO;
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.UserPublicDTO;
 import gr.tei.erasmus.pp.eventmate.backend.models.User;
 import gr.tei.erasmus.pp.eventmate.backend.repository.UserRepository;
@@ -128,5 +129,18 @@ public class UserService {
         return userDto;
     }
 
+    public UserLightDTO convertToLightDto(User user) {
+
+        UserLightDTO userDto = modelMapper.map(user, UserLightDTO.class);
+
+        return userDto;
+    }
+
+    public User convertFromLightDto(UserLightDTO userDto) {
+
+        User user = modelMapper.map(userDto, User.class);
+
+        return user;
+    }
 
 }

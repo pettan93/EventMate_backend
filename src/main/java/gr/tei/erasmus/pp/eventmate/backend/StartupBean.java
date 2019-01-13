@@ -4,6 +4,7 @@ import gr.tei.erasmus.pp.eventmate.backend.enums.*;
 import gr.tei.erasmus.pp.eventmate.backend.models.*;
 import gr.tei.erasmus.pp.eventmate.backend.repository.EventRepository;
 import gr.tei.erasmus.pp.eventmate.backend.repository.TaskRepository;
+import gr.tei.erasmus.pp.eventmate.backend.services.ChatService;
 import gr.tei.erasmus.pp.eventmate.backend.services.EventService;
 import gr.tei.erasmus.pp.eventmate.backend.services.UserService;
 import gr.tei.erasmus.pp.eventmate.backend.utils.DateUtils;
@@ -30,6 +31,9 @@ public class StartupBean {
 
     private final EventRepository eventRepository;
     private final EventService eventService;
+
+    @Autowired
+    private ChatService chatService;
 
 
     private final UserService userService;
@@ -214,6 +218,19 @@ public class StartupBean {
         event2.setReports(List.of(report, report2, report3, report4));
 
         eventRepository.save(event2);
+
+
+        chatService.sendMessage(new ChatMessage(user1,user2,"ahoj"));
+        chatService.sendMessage(new ChatMessage(user1,user2,"jak se mas?"));
+        chatService.sendMessage(new ChatMessage(user1,user2,"ses tam?"));
+
+        chatService.sendMessage(new ChatMessage(user1,user3,"user 2 me ignoruje"));
+        chatService.sendMessage(new ChatMessage(user1,user3,":("));
+
+        chatService.sendMessage(new ChatMessage(user3,user2,"odpovez mu vole"));
+
+        chatService.sendMessage(new ChatMessage(user2,user1,"ahoj, jo jsem"));
+        chatService.sendMessage(new ChatMessage(user2,user1,"mam se fajn"));
 
 
     }
