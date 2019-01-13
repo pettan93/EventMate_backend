@@ -1,5 +1,6 @@
 package gr.tei.erasmus.pp.eventmate.backend.utils;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -19,6 +20,10 @@ public class DateUtils {
 
     public static Date toDate(LocalDateTime localDateTime){
         return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+    }
+
+    public static String formatDate(Date d, String format) {
+        return d != null ? new SimpleDateFormat(format).format(d) : null;
     }
 
 

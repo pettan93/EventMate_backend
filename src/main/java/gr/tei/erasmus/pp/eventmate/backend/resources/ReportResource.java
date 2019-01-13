@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -105,14 +104,14 @@ public class ReportResource {
             return ResponseEntity.status(403).body("User dont have permission for event");
 
         if (!reportService.isEventInReportableState(eventOptional.get()))
-            return ResponseEntity.status(400).body("Event is finished yet");
+            return ResponseEntity.status(400).body("Event is not finished yet");
 
 
+        report.setContent(reportService.generateReport(reportDTO,eventOptional.get(),user));
         report.setReportCreator(user);
 
-        var editedReport = reportService.addReportToEvent(eventOptional.get(), report);
 
-        // todo create pdf on server side, set preview and save it
+        var editedReport = reportService.addReportToEvent(eventOptional.get(), report);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(reportService.convertToDto(editedReport));
     }

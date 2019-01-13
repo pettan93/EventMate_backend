@@ -1,28 +1,23 @@
 package gr.tei.erasmus.pp.eventmate.backend.services;
 
-import gr.tei.erasmus.pp.eventmate.backend.DTOs.ReportResponseDTO;
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.ReportRequestDTO;
+import gr.tei.erasmus.pp.eventmate.backend.DTOs.ReportResponseDTO;
+import gr.tei.erasmus.pp.eventmate.backend.ReportCreator;
 import gr.tei.erasmus.pp.eventmate.backend.enums.EventState;
 import gr.tei.erasmus.pp.eventmate.backend.models.Event;
 import gr.tei.erasmus.pp.eventmate.backend.models.Report;
 import gr.tei.erasmus.pp.eventmate.backend.models.User;
-import gr.tei.erasmus.pp.eventmate.backend.models.UserPrincipal;
 import gr.tei.erasmus.pp.eventmate.backend.repository.ReportRepository;
 import gr.tei.erasmus.pp.eventmate.backend.utils.FileUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
+import java.io.File;
+import java.sql.Blob;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.Properties;
 
 @Service
 public class ReportService {
@@ -38,6 +33,15 @@ public class ReportService {
     @Autowired
     private EventService eventService;
 
+
+    public Blob generateReport(ReportRequestDTO reportRequestDTO, Event event, User creator){
+
+        System.out.println("generate report!");
+
+        File f = new ReportCreator().generateReport(reportRequestDTO,event,creator);
+
+        return FileUtils.getFileBlob(f);
+    }
 
     public Report addReportToEvent(Event e, Report report) {
 

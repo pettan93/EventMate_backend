@@ -33,6 +33,15 @@ public class User {
         this.score = score;
     }
 
+    public User(Long id, String userName, String email, String password, Blob photo, Integer score) {
+        this.id = id;
+        this.userName = userName;
+        this.email = email;
+        this.password = password;
+        this.photo = photo;
+        this.score = score;
+    }
+
     public Long getId() {
         return id;
     }

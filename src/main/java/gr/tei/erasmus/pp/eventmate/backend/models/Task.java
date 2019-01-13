@@ -56,6 +56,46 @@ public class Task {
         this.submissions = submissions;
     }
 
+    public Task(
+            Long id,
+            String name,
+            User taskOwner,
+            List<User> assignees,
+            String place,
+            String description,
+            Long points,
+            Boolean timeLimited,
+            Integer timeLimit) {
+        this.id = id;
+        this.name = name;
+        this.taskOwner = taskOwner;
+        this.assignees = assignees;
+        this.place = place;
+        this.description = description;
+        this.points = points;
+        this.timeLimited = timeLimited;
+        this.timeLimit = timeLimit;
+    }
+
+    public Task(
+            String name,
+            User taskOwner,
+            List<User> assignees,
+            String place,
+            String description,
+            Long points,
+            Boolean timeLimited,
+            Integer timeLimit) {
+        this.name = name;
+        this.taskOwner = taskOwner;
+        this.assignees = assignees;
+        this.place = place;
+        this.description = description;
+        this.points = points;
+        this.timeLimited = timeLimited;
+        this.timeLimit = timeLimit;
+    }
+
     public Integer getTimeLimit() {
         return timeLimit;
     }
