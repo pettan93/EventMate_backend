@@ -1,10 +1,16 @@
 package gr.tei.erasmus.pp.eventmate.backend.models;
 
+import javax.persistence.Entity;
+
+@Entity
 public class UserSubmissionPoints {
 
     private long idUser;
 
     private long points;
+
+    public UserSubmissionPoints() {
+    }
 
     public UserSubmissionPoints(long idUser, long points) {
         this.idUser = idUser;

@@ -1,5 +1,6 @@
 package gr.tei.erasmus.pp.eventmate.backend.resources;
 
+import gr.tei.erasmus.pp.eventmate.backend.DTOs.ChatMessageDTO;
 import gr.tei.erasmus.pp.eventmate.backend.enums.ErrorType;
 import gr.tei.erasmus.pp.eventmate.backend.models.User;
 import gr.tei.erasmus.pp.eventmate.backend.models.UserPrincipal;
@@ -8,15 +9,13 @@ import gr.tei.erasmus.pp.eventmate.backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-public class ChatResourse {
+public class ChatResource {
 
 
     @Autowired
@@ -24,11 +23,23 @@ public class ChatResourse {
     @Autowired
     private UserService userService;
 
+    /**
+     * Sends message
+     */
+    @PostMapping("/message")
+    public ResponseEntity<Object> sendMessage(@RequestBody ChatMessageDTO msgDto) {
+        User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+
+        var msg = chatService.convertToEntity(msgDto);
+        msg.setFrom(user);
+
+        return ResponseEntity.ok().body(chatService.convertToDto(chatService.sendMessage(msg)));
+    }
+
 
     /**
      * All messages
-     * - from me to anyone
-     * - from anyone to me
+     * - from me to anyone OR from anyone to me
      */
     @GetMapping("/me/messages")
     public ResponseEntity<Object> getAllMessagess() {
@@ -57,6 +68,7 @@ public class ChatResourse {
                 .map(invitation -> chatService.convertToDto(invitation))
                 .collect(Collectors.toList()));
     }
+
 
     /**
      * List of lasts messages with each user I have chatted with

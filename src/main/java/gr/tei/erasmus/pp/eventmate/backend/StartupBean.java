@@ -226,11 +226,14 @@ public class StartupBean {
 
         chatService.sendMessage(new ChatMessage(user1,user3,"user 2 me ignoruje"));
         chatService.sendMessage(new ChatMessage(user1,user3,":("));
+        chatService.sendMessage(new ChatMessage(user1,user3,"LAST"));
 
         chatService.sendMessage(new ChatMessage(user3,user2,"odpovez mu vole"));
+        chatService.sendMessage(new ChatMessage(user3,user2,"LAST"));
 
         chatService.sendMessage(new ChatMessage(user2,user1,"ahoj, jo jsem"));
         chatService.sendMessage(new ChatMessage(user2,user1,"mam se fajn"));
+        chatService.sendMessage(new ChatMessage(user2,user1,"LAST"));
 
 
     }
