@@ -107,9 +107,8 @@ public class ReportResource {
         if (!reportService.isEventInReportableState(eventOptional.get()))
             return ResponseEntity.status(400).body(ErrorType.EVENT_NOT_IN_FINISHED_STATE.statusCode);
 
-        report.setContent(reportService.generateReport(reportDTO,eventOptional.get(),user));
-        report.setReportCreator(user);
 
+        report = reportService.generateReport(report,reportDTO,eventOptional.get(),user);
 
         var editedReport = reportService.addReportToEvent(eventOptional.get(), report);
 

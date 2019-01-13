@@ -59,7 +59,6 @@ public class InvitationResource {
                 .collect(Collectors.toList());
 
 
-
         eventService.addInvitations(eventOptional.get(), invitationList);
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(eventService.convertToDto(eventOptional.get()));

@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.sql.Blob;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -33,14 +32,29 @@ public class ReportService {
     @Autowired
     private EventService eventService;
 
+    private ReportCreator reportCreator = new ReportCreator();
 
-    public Blob generateReport(ReportRequestDTO reportRequestDTO, Event event, User creator){
 
-        System.out.println("generate report!");
+//    public Blob generateReport(ReportRequestDTO reportRequestDTO, Event event, User creator) {
+//        File f = reportCreator.generateReport(reportRequestDTO, event, creator);
+//        return FileUtils.getFileBlob(f);
+//    }
+//
+//    public Blob generatePreview(File reportFile) {
+//        return FileUtils.getFileBlob(reportCreator.generatePreview(reportFile));
+//    }
 
-        File f = new ReportCreator().generateReport(reportRequestDTO,event,creator);
 
-        return FileUtils.getFileBlob(f);
+    public Report generateReport(Report report, ReportRequestDTO reportRequestDTO, Event event, User user) {
+        File reportPdf = reportCreator.generateReport(reportRequestDTO, event, user);
+        File preview = reportCreator.generatePreview(reportPdf);
+
+        report.setContent(FileUtils.getFileBlob(reportPdf));
+        report.setPreview(FileUtils.getFileBlob(preview));
+
+        report.setReportCreator(user);
+
+        return report;
     }
 
     public Report addReportToEvent(Event e, Report report) {

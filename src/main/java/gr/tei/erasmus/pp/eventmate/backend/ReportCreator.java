@@ -12,8 +12,12 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.apache.pdfbox.rendering.ImageType;
+import org.apache.pdfbox.rendering.PDFRenderer;
+import org.apache.pdfbox.tools.imageio.ImageIOUtil;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
@@ -24,11 +28,11 @@ public class ReportCreator {
     public File generateReport(ReportRequestDTO rpr, Event event, User reportCreator) {
 
 
-        switch (rpr.getType()){
+        switch (rpr.getType()) {
             case CERTIFICATE:
-                return generateCerticateReport(rpr,event,reportCreator);
+                return generateCerticateReport(rpr, event, reportCreator);
             case FULL_SUMMARY:
-                return generateFullSummaryReport(rpr,event,reportCreator);
+                return generateFullSummaryReport(rpr, event, reportCreator);
         }
 
 
@@ -54,16 +58,16 @@ public class ReportCreator {
             contents.setStrokingColor(Color.GRAY);
 
             // report name
-            putText(contents, font, 24, 380 - (rpr.getName().length()*5) + 10, 320, rpr.getName());
+            putText(contents, font, 24, 380 - (rpr.getName().length() * 5) + 10, 320, rpr.getName());
 
             // event name
-            if(rpr.getReportInfoDTO().getIncludeName()){
-                putText(contents, font, 14, 380 - (event.getName().length()*5) + 30, 290, event.getName());
+            if (rpr.getReportInfoDTO().getIncludeName()) {
+                putText(contents, font, 14, 380 - (event.getName().length() * 5) + 30, 290, event.getName());
             }
 
 
             // report comment
-            putText(contents, font, 16, 380 - (rpr.getComment().length()*3) - 5, 265, rpr.getComment());
+            putText(contents, font, 16, 380 - (rpr.getComment().length() * 3) - 5, 265, rpr.getComment());
 
 
             String finalString = "Created ";
@@ -192,8 +196,6 @@ public class ReportCreator {
             }
 
 
-
-
             String finalString = "Created ";
             //report creator
             if (rpr.getReportInfoDTO().getIncludeReportCreator()) {
@@ -224,6 +226,17 @@ public class ReportCreator {
         return saveFile;
     }
 
+    public File generatePreview(File pdf) {
+        File preview = new File("reports/preview.jpg");
+        try (final PDDocument document = PDDocument.load(pdf)) {
+            PDFRenderer pdfRenderer = new PDFRenderer(document);
+            BufferedImage bim = pdfRenderer.renderImageWithDPI(0, 30, ImageType.RGB);
+            ImageIOUtil.writeImage(bim, preview.getAbsolutePath(), 30);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return preview;
+    }
 
     private PDPageContentStream putText(PDPageContentStream contents, PDFont font, Integer size, Integer x, Integer y, String text) throws IOException {
         return putText(contents, Color.BLACK, font, size, x, y, text);
@@ -238,7 +251,6 @@ public class ReportCreator {
         contents.endText();
         return contents;
     }
-
 
 
 }
