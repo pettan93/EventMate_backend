@@ -152,11 +152,13 @@ public class FileResource {
         if (submissionFileOptional.isEmpty())
             return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
 
-
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!submissionService.hasPermissionForSubmissionFile(user, submissionFileOptional.get()))
             return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_SUBMISSION_FILE.statusCode);
+
+
+        submissionFileRepository.delete(submissionFileOptional);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
