@@ -84,6 +84,18 @@ public class SubmissionService {
         return true;
     }
 
+    public Submission saveSubmission(Submission s){
+        return submissionRepository.save(s);
+    }
+
+    public Submission getParentSubmission(SubmissionFile submissionFile){
+
+        return submissionRepository.findAll()
+                .stream()
+                .filter(submission -> submission.getContent().contains(submissionFile))
+                .collect(Collectors.toList()).get(0);
+    }
+
     public Boolean hasPermissionForSubmissionFile(User user, SubmissionFile submissionFile) {
 
         var submissions = submissionRepository.findAll().stream()

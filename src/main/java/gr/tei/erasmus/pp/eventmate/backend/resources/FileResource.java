@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.Blob;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 public class FileResource {
@@ -158,14 +157,17 @@ public class FileResource {
             return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_SUBMISSION_FILE.statusCode);
 
 
-        submissionFileRepository.delete(submissionFileOptional);
+        var parentSubmission = submissionService.getParentSubmission(submissionFileOptional.get());
+
+        parentSubmission.getContent().remove(submissionFileOptional.get());
+
+
+        submissionService.saveSubmission(parentSubmission);
+
+        submissionFileRepository.delete(submissionFileOptional.get());
 
         return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(submissionService.getParentTaskOfSubmissionFile(submissionFileOptional.get()).
-                        getSubmissions().stream().filter(s -> s.getSubmitter().getId().equals(user.getId()))
-                        .map(submission -> submissionService.convertToDto(submission))
-                        .collect(Collectors.toList()));
+                .status(HttpStatus.OK).build();
     }
 
 }

@@ -120,7 +120,7 @@ public class TaskResource {
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!taskService.isOwner(user, taskOptional.get()))
-            return ResponseEntity.status(400).body(ErrorType.USER_NOT_EVENT_OWNER.statusCode);
+            return ResponseEntity.status(400).body(ErrorType.USER_NOT_TASK_OWNER.statusCode);
 
 
         Task savedTask = taskService.pushTaskState(taskOptional.get());
