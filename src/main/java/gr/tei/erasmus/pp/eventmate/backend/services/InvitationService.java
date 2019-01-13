@@ -23,6 +23,8 @@ public class InvitationService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private UserService userService;
 
     public List<Invitation> getUserInvitations(User user) {
 
@@ -74,6 +76,8 @@ public class InvitationService {
     public Invitation convertToEntity(InvitationDTO invitationDto) {
 
         Invitation invitation = modelMapper.map(invitationDto, Invitation.class);
+
+        invitation.setUser(userService.convertToEntity(invitationDto.getUser()));
 
 //        if (invitationDto.getId() != null) {
 //            Optional<Event> oldEvent = eventRepository.findById(invitationDto.getId());
