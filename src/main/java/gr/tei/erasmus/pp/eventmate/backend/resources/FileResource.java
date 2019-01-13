@@ -157,8 +157,9 @@ public class FileResource {
             return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_SUBMISSION_FILE.statusCode);
 
 
-
         var parentSubmission = submissionService.getParentSubmission(submissionFileOptional.get());
+
+        var parentTask = submissionService.getParentTask(parentSubmission);
 
         parentSubmission.getContent().remove(submissionFileOptional.get());
 
@@ -167,7 +168,7 @@ public class FileResource {
         submissionFileRepository.delete(submissionFileOptional.get());
 
         return ResponseEntity
-                .status(HttpStatus.OK).build();
+                .status(HttpStatus.OK).body(submissionService.getUserSubmissionForTask(parentTask, user));
     }
 
 }
