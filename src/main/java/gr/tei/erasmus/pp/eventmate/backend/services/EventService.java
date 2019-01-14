@@ -2,6 +2,7 @@ package gr.tei.erasmus.pp.eventmate.backend.services;
 
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.EventDTO;
 import gr.tei.erasmus.pp.eventmate.backend.enums.EventState;
+import gr.tei.erasmus.pp.eventmate.backend.enums.TaskState;
 import gr.tei.erasmus.pp.eventmate.backend.models.*;
 import gr.tei.erasmus.pp.eventmate.backend.repository.EventRepository;
 import gr.tei.erasmus.pp.eventmate.backend.repository.TaskRepository;
@@ -135,7 +136,22 @@ public class EventService {
 
     public Event pushEventState(Event event) {
 
+        var nextState = EventState.next(event.getState());
+
         event.setState(EventState.next(event.getState()));
+
+
+        if(nextState.equals(EventState.IN_PLAY)){
+            for (Task task : event.getTasks()) {
+                task.setTaskState(TaskState.IN_PLAY);
+            }
+        }
+
+        if(nextState.equals(EventState.UNDER_EVALUATION)){
+            for (Task task : event.getTasks()) {
+                task.setTaskState(TaskState.IN_REVIEW);
+            }
+        }
 
         eventRepository.save(event);
 

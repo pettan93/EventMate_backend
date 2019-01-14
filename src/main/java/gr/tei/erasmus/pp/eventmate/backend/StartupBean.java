@@ -83,7 +83,7 @@ public class StartupBean {
                 date1,
                 "Pub 321",
                 new ArrayList<>(),
-                EventState.IN_PLAY,
+                EventState.READY_TO_PLAY,
                 new ArrayList<>());
 
         event1.setPhoto(FileUtils.getFileBlob(new File("blank.jpg")));
