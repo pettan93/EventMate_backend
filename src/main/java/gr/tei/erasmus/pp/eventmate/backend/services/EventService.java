@@ -143,7 +143,7 @@ public class EventService {
 
         if(nextState.equals(EventState.IN_PLAY)){
             for (Task task : event.getTasks()) {
-                task.setTaskState(TaskState.IN_PLAY);
+                task.setTaskState(TaskState.READY_TO_START);
             }
         }
 

@@ -105,12 +105,9 @@ public class StartupBean {
         );
 
         task1.setPhoto(FileUtils.getFileBlob(new File("blank.jpg")));
-
-        task1.setTaskState(TaskState.IN_REVIEW);
-
+        task1.setTaskState(TaskState.IN_PLAY);
         task1.setTaskOwner(user1);
         task1.setAssignees(Arrays.asList(user2, user3));
-
 
         var sbf = new SubmissionFile();
         sbf.setName("photo proof");
@@ -122,18 +119,83 @@ public class StartupBean {
         var submission1 = new Submission();
         submission1.setSubmitter(user2);
         submission1.setContent(Arrays.asList(sbf));
-//
-//        var submission2 = new Submission();
-//        submission2.setSubmitter(user2);
-//        submission2.setContent(Arrays.asList(sbf));
-//
-//        var submission3 = new Submission();
-//        submission3.setSubmitter(user2);
-//        submission3.setContent(Arrays.asList(sbf));
 
         task1.setSubmissions(Arrays.asList(submission1));
 
-        event1.getTasks().add(task1);
+        Task task2 = new Task(
+                "Rum shots",
+                "Bar",
+                "Drink 10 rum shots",
+                10L,
+                null
+        );
+
+        task2.setPhoto(FileUtils.getFileBlob(new File("blank.jpg")));
+        task2.setTaskState(TaskState.READY_TO_START);
+        task2.setTaskOwner(user1);
+        task2.setAssignees(Arrays.asList(user2, user3));
+
+
+        Task task3 = new Task(
+                "Vodka shots",
+                "Bar",
+                "Drink 10 vodka shots",
+                10L,
+                null
+        );
+        task3.setPhoto(FileUtils.getFileBlob(new File("blank.jpg")));
+        task3.setTaskState(TaskState.IN_REVIEW);
+        task3.setTaskOwner(user1);
+        task3.setAssignees(Arrays.asList(user2, user3));
+
+        Task task4 = new Task(
+                "Vodka shots",
+                "Bar",
+                "Drink 10 vodka shots",
+                10L,
+                null
+        );
+        task4.setPhoto(FileUtils.getFileBlob(new File("blank.jpg")));
+        task4.setTaskState(TaskState.FINISHED);
+        task4.setTaskOwner(user1);
+        task4.setAssignees(Arrays.asList(user2, user3));
+
+        var sbf2 = new SubmissionFile();
+        sbf2.setName("photo proof");
+        sbf2.setComment("comment");
+        sbf2.setData(FileUtils.getFileBlob(new File("blank.jpg")));
+        sbf2.setType(FileType.PHOTO);
+        sbf2.setCreated(new Date());
+
+        var sbf3 = new SubmissionFile();
+        sbf3.setName("photo proof 2");
+        sbf3.setComment("comment 2");
+        sbf3.setData(FileUtils.getFileBlob(new File("blank.jpg")));
+        sbf3.setType(FileType.PHOTO);
+        sbf3.setCreated(new Date());
+
+        var sbf4 = new SubmissionFile();
+        sbf4.setName("my proof");
+        sbf4.setComment("comment 2");
+        sbf4.setData(FileUtils.getFileBlob(new File("blank.jpg")));
+        sbf4.setType(FileType.PHOTO);
+        sbf4.setCreated(new Date());
+
+        var submission2 = new Submission();
+        submission1.setSubmitter(user2);
+        submission1.setContent(Arrays.asList(sbf2,sbf3));
+
+        var submission3 = new Submission();
+        submission1.setSubmitter(user3);
+        submission1.setContent(Arrays.asList(sbf4));
+
+        submission2.setEarnedPoints(5);
+        submission3.setEarnedPoints(8);
+
+        task4.setSubmissions(Arrays.asList(submission2,submission3));
+
+
+        event1.getTasks().addAll(Arrays.asList(task1,task2,task3,task4));
 
 
         eventRepository.save(event1);
@@ -152,7 +214,7 @@ public class StartupBean {
         event2.setGuests(Arrays.asList(user1, user3, user4));
 
 
-        var task2 = new Task(
+        var task5 = new Task(
                 "Kiss your crush",
                 "Ampfitear",
                 "Just kiss her",
@@ -160,22 +222,24 @@ public class StartupBean {
                 null
         );
 
-        task2.setTaskState(TaskState.FINISHED);
+        task5.setTaskState(TaskState.FINISHED);
 
-        task2.setTaskOwner(user4);
-        task2.setAssignees(Collections.singletonList(user2));
+        task5.setTaskOwner(user4);
+        task5.setAssignees(Collections.singletonList(user2));
 
-        var sbf2 = new SubmissionFile();
-        sbf2.setData(FileUtils.getFileBlob(new File("blank.jpg")));
-        sbf2.setType(FileType.PHOTO);
-        sbf2.setCreated(new Date());
+        var sbf5 = new SubmissionFile();
+        sbf5.setData(FileUtils.getFileBlob(new File("blank.jpg")));
+        sbf5.setType(FileType.PHOTO);
+        sbf5.setCreated(new Date());
 
         var submission4 = new Submission();
         submission4.setSubmitter(user2);
-        submission4.setContent(Collections.singletonList(sbf2));
+        submission4.setContent(Collections.singletonList(sbf5));
         submission4.setEarnedPoints(40);
 
-        submission4.setContent(Collections.singletonList(sbf2));
+        submission4.setContent(Collections.singletonList(sbf5));
+
+        task5.setSubmissions(Arrays.asList(submission4));
 
         var report = new Report();
         report.setComment("Prvni report, dost cool");
