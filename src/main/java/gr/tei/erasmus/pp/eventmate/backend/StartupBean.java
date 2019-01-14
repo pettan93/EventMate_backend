@@ -83,7 +83,7 @@ public class StartupBean {
                 date1,
                 "Pub 321",
                 new ArrayList<>(),
-                EventState.READY_TO_PLAY,
+                EventState.IN_PLAY,
                 new ArrayList<>());
 
         event1.setPhoto(FileUtils.getFileBlob(new File("blank.jpg")));
@@ -235,6 +235,36 @@ public class StartupBean {
         chatService.sendMessage(new ChatMessage(user2,user1,"mam se fajn"));
         chatService.sendMessage(new ChatMessage(user2,user1,"LAST"));
 
+
+        Event event3 = new Event(
+                "Another event",
+                date1,
+                "Dorms",
+                new ArrayList<>(),
+                EventState.READY_TO_PLAY,
+                new ArrayList<>());
+
+        eventRepository.save(event3);
+
+        Event event4 = new Event(
+                "Goodbye Agnes",
+                date1,
+                "Dorms",
+                new ArrayList<>(),
+                EventState.UNDER_EVALUATION,
+                new ArrayList<>());
+
+        eventRepository.save(event4);
+
+        Event event5 = new Event(
+                "Country presentation",
+                date1,
+                "TEI",
+                new ArrayList<>(),
+                EventState.UNDER_EVALUATION,
+                new ArrayList<>());
+
+        eventRepository.save(event5);
 
     }
 
