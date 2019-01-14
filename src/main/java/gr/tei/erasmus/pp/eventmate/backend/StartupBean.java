@@ -244,6 +244,7 @@ public class StartupBean {
                 EventState.READY_TO_PLAY,
                 new ArrayList<>());
 
+        event3.setEventOwner(user1);
         eventRepository.save(event3);
 
         Event event4 = new Event(
@@ -254,6 +255,7 @@ public class StartupBean {
                 EventState.UNDER_EVALUATION,
                 new ArrayList<>());
 
+        event4.setEventOwner(user1);
         eventRepository.save(event4);
 
         Event event5 = new Event(
@@ -264,6 +266,7 @@ public class StartupBean {
                 EventState.UNDER_EVALUATION,
                 new ArrayList<>());
 
+        event5.setEventOwner(user1);
         eventRepository.save(event5);
 
     }
