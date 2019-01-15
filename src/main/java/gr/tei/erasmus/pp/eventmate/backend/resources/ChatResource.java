@@ -30,8 +30,8 @@ public class ChatResource {
     public ResponseEntity<Object> sendMessage(@RequestBody ChatMessageDTO msgDto) {
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
+        msgDto.setFrom(userService.convertToLightDto(user));
         var msg = chatService.convertToEntity(msgDto);
-        msg.setFrom(user);
 
         return ResponseEntity.ok().body(chatService.convertToDto(chatService.sendMessage(msg)));
     }
@@ -54,6 +54,7 @@ public class ChatResource {
 
     /**
      * All messages with me and given user
+     * detail konverzace
      */
     @GetMapping("/me/messages/user/{id}")
     public ResponseEntity<Object> getAllMessagessWithUser(@PathVariable long id) {
@@ -72,6 +73,8 @@ public class ChatResource {
 
     /**
      * List of lasts messages with each user I have chatted with
+     * konverzaca last message
+     * seznam konverzaci
      */
     @GetMapping("/me/messages/last")
     public ResponseEntity<Object> getLastMessages() {

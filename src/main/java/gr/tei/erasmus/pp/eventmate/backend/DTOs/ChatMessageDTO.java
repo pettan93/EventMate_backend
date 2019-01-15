@@ -12,10 +12,8 @@ public class ChatMessageDTO {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @OneToOne
     private UserLightDTO from;
 
-    @OneToOne
     private UserLightDTO to;
 
     private Date date;
