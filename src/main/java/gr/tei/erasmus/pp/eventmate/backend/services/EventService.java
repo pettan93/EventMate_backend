@@ -2,6 +2,7 @@ package gr.tei.erasmus.pp.eventmate.backend.services;
 
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.EventDTO;
 import gr.tei.erasmus.pp.eventmate.backend.enums.EventState;
+import gr.tei.erasmus.pp.eventmate.backend.enums.InvitationType;
 import gr.tei.erasmus.pp.eventmate.backend.enums.TaskState;
 import gr.tei.erasmus.pp.eventmate.backend.models.*;
 import gr.tei.erasmus.pp.eventmate.backend.repository.EventRepository;
@@ -68,20 +69,44 @@ public class EventService {
         return eventRepository.save(event);
     }
 
-    public Event createEvent(User user, Event event) {
 
-        // TODO
+    private Event invite(Event event) {
+
+        if (event.getGuests() == null) {
+            event.setGuests(new ArrayList<>());
+        }
+
         if (event.getInvitations() != null) {
+
+
             for (Invitation invitation : event.getInvitations()) {
-                if (invitation.getUser() != null && event.getGuests() != null && !event.getGuests().contains(invitation.getUser())) {
-                    System.out.println("process invite");
-                    event.getGuests().add(invitation.getUser());
-                } else {
+
+                if (invitation.getInvitationType().equals(InvitationType.NOTIFICATION)) {
+                    System.out.println("process invite user");
+
+                    if (event.getGuests().contains(invitation.getUser())) {
+                        System.out.println("user already guest");
+                    } else {
+                        event.getGuests().add(invitation.getUser());
+                    }
+                    continue;
+                }
+
+                if (invitation.getInvitationType().equals(InvitationType.EMAIL)) {
                     System.out.println("process invite mail");
                     emailService.sendEmailInvitation(invitation.getEmail(), event);
                 }
             }
         }
+
+        return event;
+    }
+
+    public Event createEvent(User user, Event event) {
+
+        System.out.println("create event");
+
+        event = invite(event);
 
         event.setState(EventState.EDITABLE);
 
@@ -106,18 +131,7 @@ public class EventService {
     public Event updateEvent(Long id, Event event) {
 
 
-        // TODO
-        if (event.getInvitations() != null) {
-            for (Invitation invitation : event.getInvitations()) {
-                if (invitation.getUser() != null && event.getGuests() != null && !event.getGuests().contains(invitation.getUser())) {
-                    System.out.println("process invite");
-                    event.getGuests().add(invitation.getUser());
-                } else {
-                    System.out.println("process invite mail");
-                    emailService.sendEmailInvitation(invitation.getEmail(), event);
-                }
-            }
-        }
+        event = invite(event);
 
 
         event.setId(id);
