@@ -182,7 +182,7 @@ public class SubmissionService {
         }
 
 
-        submissionDto.setSubmitter((userService.convertToDto(submission.getSubmitter())));
+        submissionDto.setSubmitter(userService.convertToDto(submission.getSubmitter()));
 
 
         return submissionDto;

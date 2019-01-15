@@ -181,18 +181,22 @@ public class StartupBean {
         sbf4.setType(FileType.PHOTO);
         sbf4.setCreated(new Date());
 
-//        var submission2 = new Submission();
-//        submission1.setSubmitter(user2);
-//        submission1.setContent(Arrays.asList(sbf2,sbf3));
-//
-//        var submission3 = new Submission();
-//        submission1.setSubmitter(user3);
-//        submission1.setContent(Arrays.asList(sbf4));
-//
-//        submission2.setEarnedPoints(5);
-//        submission3.setEarnedPoints(8);
+        var submission2 = new Submission();
+        submission2.setSubmitter(user2);
+        submission2.setContent(Arrays.asList(sbf2,sbf3));
 
-//        task4.setSubmissions(Arrays.asList(submission2,submission3));
+        var submission3 = new Submission();
+        submission3.setSubmitter(user3);
+        submission3.setContent(Arrays.asList(sbf4));
+
+        submission2.setEarnedPoints(5);
+        submission3.setEarnedPoints(8);
+
+        System.out.println(submission1);
+        System.out.println(submission2);
+        System.out.println(submission3);
+
+        task4.setSubmissions(Arrays.asList(submission2,submission3));
 
 
         event1.getTasks().addAll(Arrays.asList(task1,task2,task3,task4));
