@@ -33,10 +33,12 @@ public class EventService {
     private InvitationService invitationService;
     @Autowired
     private ReportService reportService;
+    @Autowired
+    private EmailService emailService;
 
 
-    public Boolean isNameUsed(String name){
-         return eventRepository.findByName(name.strip()) != null;
+    public Boolean isNameUsed(String name) {
+        return eventRepository.findByName(name.strip()) != null;
     }
 
     public Boolean hasPermission(User user, Event event) {
@@ -48,7 +50,7 @@ public class EventService {
         return event.getEventOwner().equals(user);
     }
 
-    public Event saveEvent(Event e){
+    public Event saveEvent(Event e) {
         return eventRepository.save(e);
     }
 
@@ -68,9 +70,16 @@ public class EventService {
 
     public Event createEvent(User user, Event event) {
 
-        for (Invitation invitation : event.getInvitations()) {
-            if(invitation.getUser() != null && !event.getGuests().contains(invitation.getUser())){
-                event.getGuests().add(invitation.getUser());
+        // TODO
+        if (event.getInvitations() != null) {
+            for (Invitation invitation : event.getInvitations()) {
+                if (invitation.getUser() != null && !event.getGuests().contains(invitation.getUser())) {
+                    System.out.println("process invite");
+                    event.getGuests().add(invitation.getUser());
+                } else {
+                    System.out.println("process invite mail");
+                    emailService.sendEmailInvitation(invitation.getEmail(), event);
+                }
             }
         }
 
@@ -98,11 +107,18 @@ public class EventService {
 
 
         // TODO
-        for (Invitation invitation : event.getInvitations()) {
-            if(invitation.getUser() != null && !event.getGuests().contains(invitation.getUser())){
-                event.getGuests().add(invitation.getUser());
+        if (event.getInvitations() != null) {
+            for (Invitation invitation : event.getInvitations()) {
+                if (invitation.getUser() != null && !event.getGuests().contains(invitation.getUser())) {
+                    System.out.println("process invite");
+                    event.getGuests().add(invitation.getUser());
+                } else {
+                    System.out.println("process invite mail");
+                    emailService.sendEmailInvitation(invitation.getEmail(), event);
+                }
             }
         }
+
 
         event.setId(id);
         return eventRepository.save(event);
@@ -156,13 +172,13 @@ public class EventService {
         event.setState(EventState.next(event.getState()));
 
 
-        if(nextState.equals(EventState.IN_PLAY)){
+        if (nextState.equals(EventState.IN_PLAY)) {
             for (Task task : event.getTasks()) {
                 task.setTaskState(TaskState.READY_TO_START);
             }
         }
 
-        if(nextState.equals(EventState.UNDER_EVALUATION)){
+        if (nextState.equals(EventState.UNDER_EVALUATION)) {
             for (Task task : event.getTasks()) {
                 task.setTaskState(TaskState.IN_REVIEW);
             }
@@ -172,7 +188,6 @@ public class EventService {
 
         return event;
     }
-
 
 
     public Boolean isEditable(Event event) {
@@ -240,7 +255,7 @@ public class EventService {
         if (event.getPhoto() != null) {
             try {
 
-               eventDto.setPhoto(FileUtils.getEncodedStringFromBlob(event.getPhoto()));
+                eventDto.setPhoto(FileUtils.getEncodedStringFromBlob(event.getPhoto()));
 
             } catch (Exception e) {
                 e.printStackTrace();
