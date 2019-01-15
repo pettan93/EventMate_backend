@@ -73,7 +73,7 @@ public class EventService {
         // TODO
         if (event.getInvitations() != null) {
             for (Invitation invitation : event.getInvitations()) {
-                if (invitation.getUser() != null && !event.getGuests().contains(invitation.getUser())) {
+                if (invitation.getUser() != null && event.getGuests() != null && !event.getGuests().contains(invitation.getUser())) {
                     System.out.println("process invite");
                     event.getGuests().add(invitation.getUser());
                 } else {
@@ -109,7 +109,7 @@ public class EventService {
         // TODO
         if (event.getInvitations() != null) {
             for (Invitation invitation : event.getInvitations()) {
-                if (invitation.getUser() != null && !event.getGuests().contains(invitation.getUser())) {
+                if (invitation.getUser() != null && event.getGuests() != null && !event.getGuests().contains(invitation.getUser())) {
                     System.out.println("process invite");
                     event.getGuests().add(invitation.getUser());
                 } else {
