@@ -193,6 +193,9 @@ public class EventResource {
 
         Event updatedEvent = eventService.updateEvent(eventOptional.get().getId(), event);
 
+
+
+
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(eventService.convertToDto(updatedEvent));
     }
 

@@ -68,6 +68,12 @@ public class EventService {
 
     public Event createEvent(User user, Event event) {
 
+        for (Invitation invitation : event.getInvitations()) {
+            if(invitation.getUser() != null && !event.getGuests().contains(invitation.getUser())){
+                event.getGuests().add(invitation.getUser());
+            }
+        }
+
         event.setState(EventState.EDITABLE);
 
         event.setEventOwner(user);
@@ -89,6 +95,15 @@ public class EventService {
     }
 
     public Event updateEvent(Long id, Event event) {
+
+
+        // TODO
+        for (Invitation invitation : event.getInvitations()) {
+            if(invitation.getUser() != null && !event.getGuests().contains(invitation.getUser())){
+                event.getGuests().add(invitation.getUser());
+            }
+        }
+
         event.setId(id);
         return eventRepository.save(event);
     }
