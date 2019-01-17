@@ -70,4 +70,16 @@ public class Invitation {
     public void setInvitationState(InvitationState invitationState) {
         this.invitationState = invitationState;
     }
+
+
+    @Override
+    public String toString() {
+        return "Invitation{" +
+                "id=" + id +
+                ", user=" + user +
+                ", email='" + email + '\'' +
+                ", invitationType=" + invitationType +
+                ", invitationState=" + invitationState +
+                '}';
+    }
 }

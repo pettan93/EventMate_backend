@@ -1,9 +1,9 @@
 package gr.tei.erasmus.pp.eventmate.backend.resources;
 
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.InvitationDTO;
+import gr.tei.erasmus.pp.eventmate.backend.config.Consts;
 import gr.tei.erasmus.pp.eventmate.backend.enums.ErrorType;
 import gr.tei.erasmus.pp.eventmate.backend.models.Event;
-import gr.tei.erasmus.pp.eventmate.backend.models.Invitation;
 import gr.tei.erasmus.pp.eventmate.backend.models.User;
 import gr.tei.erasmus.pp.eventmate.backend.models.UserPrincipal;
 import gr.tei.erasmus.pp.eventmate.backend.repository.EventRepository;
@@ -47,44 +47,30 @@ public class InvitationResource {
         Optional<Event> eventOptional = eventRepository.findById(id);
 
         if (eventOptional.isEmpty())
-            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.ENTITY_NOT_FOUND.statusCode))
+                    .build();
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!eventService.hasPermission(user, eventOptional.get()))
-            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode))
+                    .build();
 
         var invitationList = invitations.stream()
                 .map(invitationDTO -> invitationService.convertToEntity(invitationDTO))
                 .collect(Collectors.toList());
 
 
-        eventService.addInvitations(eventOptional.get(), invitationList);
+        var edited = eventService.addInvitations(eventOptional.get(), invitationList);
 
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(eventService.convertToDto(eventOptional.get()));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(eventService.convertToDto(edited));
     }
 
-    /**
-     * Permission: Everyone involved in event
-     */
-    @PostMapping("/event/{id}/invitation")
-    public ResponseEntity<Object> inviteUsers(@RequestBody Invitation invitation, @PathVariable long id) {
 
-        Optional<Event> eventOptional = eventRepository.findById(id);
-
-        if (eventOptional.isEmpty())
-            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
-
-        User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
-
-        if (!eventService.hasPermission(user, eventOptional.get()))
-            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode);
-
-        eventService.addInvitation(eventOptional.get(), invitation);
-
-
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(eventService.convertToDto(eventOptional.get()));
-    }
 
 
 }

@@ -20,6 +20,17 @@ public class SubmissionDTO {
 
     private Integer earnedPoints;
 
+    private Long parentTaskId;
+
+
+    public Long getParentTaskId() {
+        return parentTaskId;
+    }
+
+    public void setParentTaskId(Long parentTaskId) {
+        this.parentTaskId = parentTaskId;
+    }
+
     public Long getId() {
         return id;
     }
@@ -84,4 +95,17 @@ public class SubmissionDTO {
         this.taskPhoto = taskPhoto;
     }
 
+    @Override
+    public String toString() {
+        return "SubmissionDTO{" +
+                "id=" + id +
+                ", taskName='" + taskName + '\'' +
+                ", taskPhoto='" + taskPhoto + '\'' +
+                ", taskDescription='" + taskDescription + '\'' +
+                ", content=" + content +
+                ", submitter=" + submitter +
+                ", maxPoints=" + maxPoints +
+                ", earnedPoints=" + earnedPoints +
+                '}';
+    }
 }

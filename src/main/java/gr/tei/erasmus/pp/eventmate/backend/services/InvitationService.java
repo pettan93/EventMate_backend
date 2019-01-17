@@ -70,6 +70,11 @@ public class InvitationService {
 
         InvitationDTO invitationDTO = modelMapper.map(invitation, InvitationDTO.class);
 
+        if(invitation.getUser() != null){
+            invitationDTO.setUser(userService.convertToDto(invitation.getUser()));
+        }
+
+
         return invitationDTO;
     }
 
@@ -77,7 +82,10 @@ public class InvitationService {
 
         Invitation invitation = modelMapper.map(invitationDto, Invitation.class);
 
-        invitation.setUser(userService.convertToEntity(invitationDto.getUser()));
+        if(invitationDto.getUser() != null){
+            invitation.setUser(userService.convertToEntity(invitationDto.getUser()));
+        }
+
 
 //        if (invitationDto.getId() != null) {
 //            Optional<Event> oldEvent = eventRepository.findById(invitationDto.getId());

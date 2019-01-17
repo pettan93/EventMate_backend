@@ -1,6 +1,7 @@
 package gr.tei.erasmus.pp.eventmate.backend.resources;
 
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.ChatMessageDTO;
+import gr.tei.erasmus.pp.eventmate.backend.config.Consts;
 import gr.tei.erasmus.pp.eventmate.backend.enums.ErrorType;
 import gr.tei.erasmus.pp.eventmate.backend.models.User;
 import gr.tei.erasmus.pp.eventmate.backend.models.UserPrincipal;
@@ -33,7 +34,14 @@ public class ChatResource {
         msgDto.setFrom(userService.convertToLightDto(user));
         var msg = chatService.convertToEntity(msgDto);
 
-        return ResponseEntity.ok().body(chatService.convertToDto(chatService.sendMessage(msg)));
+        msg.getTo().setId(userService.getUserByEmail(msg.getTo().getEmail()).getId());
+        msg.getTo().setUserName(userService.getUserByEmail(msg.getTo().getEmail()).getUserName());
+
+        chatService.sendMessage(msg);
+
+        return ResponseEntity.ok().body(chatService.getAllMessagessBetweenUsers(user, msg.getTo()).stream()
+                .map(invitation -> chatService.convertToDto(invitation))
+                .collect(Collectors.toList()));
     }
 
 
@@ -63,9 +71,12 @@ public class ChatResource {
         Optional<User> user2 = Optional.ofNullable(userService.getUserById(id));
 
         if (user2.isEmpty())
-            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
+            return ResponseEntity
+                            .status(400)
+                            .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.ENTITY_NOT_FOUND.statusCode))
+                            .build();
 
-        return ResponseEntity.ok().body(chatService.getAllMessagessBetweenUsers(user,user2.get()).stream()
+        return ResponseEntity.ok().body(chatService.getAllMessagessBetweenUsers(user, user2.get()).stream()
                 .map(invitation -> chatService.convertToDto(invitation))
                 .collect(Collectors.toList()));
     }

@@ -3,6 +3,7 @@ package gr.tei.erasmus.pp.eventmate.backend.resources;
 
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.EventDTO;
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.TaskDTO;
+import gr.tei.erasmus.pp.eventmate.backend.config.Consts;
 import gr.tei.erasmus.pp.eventmate.backend.enums.ErrorType;
 import gr.tei.erasmus.pp.eventmate.backend.models.Event;
 import gr.tei.erasmus.pp.eventmate.backend.models.Task;
@@ -45,12 +46,19 @@ public class EventResource {
         Optional<Event> event = eventRepository.findById(id);
 
         if (event.isEmpty())
-            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.ENTITY_NOT_FOUND.statusCode))
+                    .build();
+
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!eventService.hasPermission(user, event.get()))
-            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode))
+                    .build();
 
 
         return ResponseEntity.ok(eventService.convertToDto(event.get()));
@@ -64,12 +72,18 @@ public class EventResource {
         Optional<Event> event = eventRepository.findById(id);
 
         if (event.isEmpty())
-            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.ENTITY_NOT_FOUND.statusCode))
+                    .build();
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!eventService.hasPermission(user, event.get()))
-            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode))
+                    .build();
 
         return ResponseEntity.ok(event.get().getGuests()
                 .stream()
@@ -86,12 +100,18 @@ public class EventResource {
         Optional<Event> event = eventRepository.findById(id);
 
         if (event.isEmpty())
-            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.ENTITY_NOT_FOUND.statusCode))
+                    .build();
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!eventService.hasPermission(user, event.get()))
-            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode))
+                    .build();
 
         return ResponseEntity.ok(event.get().getTasks()
                 .stream()
@@ -109,7 +129,10 @@ public class EventResource {
         Event event = eventService.convertToEntity(eventDto);
 
         if (eventService.isNameUsed(event.getName()))
-            return ResponseEntity.status(400).body(ErrorType.EVENT_NAME_USED.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.EVENT_NAME_USED.statusCode))
+                    .build();
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
@@ -128,13 +151,18 @@ public class EventResource {
         Optional<Event> event = eventRepository.findById(id);
 
         if (event.isEmpty())
-            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.ENTITY_NOT_FOUND.statusCode))
+                    .build();
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!eventService.hasPermission(user, event.get()))
-            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode);
-
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode))
+                    .build();
 
         eventService.deleteEvent(event.get());
 
@@ -153,16 +181,25 @@ public class EventResource {
         Optional<Event> eventOptional = eventRepository.findById(id);
 
         if (eventOptional.isEmpty())
-            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.ENTITY_NOT_FOUND.statusCode))
+                    .build();
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!eventService.hasPermission(user, eventOptional.get()))
-            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode))
+                    .build();
+
 
         if (!eventService.isEditable(eventOptional.get()))
-            return ResponseEntity.status(400).body(ErrorType.EVENT_NOT_IN_EDITABLE_STATE.statusCode);
-
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.EVENT_NOT_IN_EDITABLE_STATE.statusCode))
+                    .build();
 
 
         Task savedTask = taskService.createTask(user, task);
@@ -184,16 +221,25 @@ public class EventResource {
         Optional<Event> eventOptional = eventRepository.findById(id);
 
         if (eventOptional.isEmpty())
-            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.ENTITY_NOT_FOUND.statusCode))
+                    .build();
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!eventService.isOwner(user, eventOptional.get()))
-            return ResponseEntity.status(400).body(ErrorType.USER_NOT_EVENT_OWNER.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.USER_NOT_EVENT_OWNER.statusCode))
+                    .build();
+
+
+        System.out.println("prekonvertovany je");
+
+        System.out.println(event);
 
         Event updatedEvent = eventService.updateEvent(eventOptional.get().getId(), event);
-
-
 
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(eventService.convertToDto(updatedEvent));
@@ -209,12 +255,18 @@ public class EventResource {
         Optional<Event> eventOptional = eventRepository.findById(id);
 
         if (eventOptional.isEmpty())
-            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.ENTITY_NOT_FOUND.statusCode))
+                    .build();
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!eventService.isOwner(user, eventOptional.get()))
-            return ResponseEntity.status(400).body(ErrorType.USER_NOT_EVENT_OWNER.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.USER_NOT_EVENT_OWNER.statusCode))
+                    .build();
 
 
         Event savedEvent = eventService.pushEventState(eventOptional.get());

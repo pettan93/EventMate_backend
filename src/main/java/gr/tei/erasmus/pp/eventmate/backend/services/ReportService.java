@@ -106,6 +106,16 @@ public class ReportService {
                 e.printStackTrace();
             }
         }
+
+        if (report.getContent() != null) {
+            try {
+                reportDto.setContent(FileUtils.getEncodedStringFromBlob(report.getContent()));
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         return reportDto;
     }
 

@@ -48,12 +48,28 @@ public class Task {
                 String place,
                 String description,
                 Long points,
-                ArrayList<Submission> submissions) {
+                List<Submission> submissions) {
         this.name = name;
         this.place = place;
         this.description = description;
         this.points = points;
         this.submissions = submissions;
+    }
+
+    public Task(String name,
+                String place,
+                String description,
+                Long points,
+                ArrayList<Submission> submissions,
+                User taskOwner,
+                TaskState taskState) {
+        this.name = name;
+        this.place = place;
+        this.description = description;
+        this.points = points;
+        this.submissions = submissions;
+        this.taskOwner = taskOwner;
+        this.taskState = taskState;
     }
 
     public Task(
@@ -198,6 +214,24 @@ public class Task {
 
     public void setPhoto(Blob photo) {
         this.photo = photo;
+    }
+
+    @Override
+    public String toString() {
+        return "Task{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", taskOwner=" + taskOwner +
+                ", assignees=" + assignees +
+                ", place='" + place + '\'' +
+                ", description='" + description + '\'' +
+                ", points=" + points +
+                ", taskState=" + taskState +
+                ", timeLimited=" + timeLimited +
+                ", remainingTime=" + remainingTime +
+                ", timeLimit=" + timeLimit +
+                ", submissions=" + submissions +
+                '}';
     }
 }
 

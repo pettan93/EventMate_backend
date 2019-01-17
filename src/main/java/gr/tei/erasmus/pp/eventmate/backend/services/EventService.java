@@ -55,64 +55,60 @@ public class EventService {
         return eventRepository.save(e);
     }
 
-    public Event asignOwner(User user, Event event) {
-
-        event.setEventOwner(user);
-
-        return eventRepository.save(event);
-    }
-
-    public Event createEvent(Event event) {
-
-        event.setState(EventState.EDITABLE);
-
-        return eventRepository.save(event);
-    }
-
 
     private Event invite(Event event) {
 
-        if (event.getGuests() == null) {
-            event.setGuests(new ArrayList<>());
-        }
 
         if (event.getInvitations() != null) {
-
 
             for (Invitation invitation : event.getInvitations()) {
 
                 if (invitation.getInvitationType().equals(InvitationType.NOTIFICATION)) {
-                    System.out.println("process invite user");
 
                     if (event.getGuests().contains(invitation.getUser())) {
-                        System.out.println("user already guest");
+                        System.out.println("uz tam je");
                     } else {
+                        System.out.println("jeste tam neni");
                         event.getGuests().add(invitation.getUser());
                     }
                     continue;
                 }
 
                 if (invitation.getInvitationType().equals(InvitationType.EMAIL)) {
-                    System.out.println("process invite mail");
-                    emailService.sendEmailInvitation(invitation.getEmail(), event);
+                    Thread thread = new Thread() {
+                        public void run() {
+                            emailService.sendEmailInvitation(invitation.getEmail(), event);
+                        }
+                    };
+                    thread.start();
                 }
             }
         }
 
+
         return event;
     }
 
-    public Event createEvent(User user, Event event) {
+    public Event createEvent(User owner, Event event) {
 
         System.out.println("create event");
 
-        event = invite(event);
+        if (event.getGuests() == null) {
+            event.setGuests(new ArrayList<>());
+        }
 
-        event.setState(EventState.EDITABLE);
+        if (!event.getGuests().contains(owner)) {
+            event.getGuests().add(owner);
+        }
 
-        event.setEventOwner(user);
 
-        return eventRepository.save(event);
+        var editedevent = invite(event);
+        if (editedevent.getState() == null) {
+            editedevent.setState(EventState.EDITABLE);
+        }
+        editedevent.setEventOwner(owner);
+
+        return eventRepository.save(editedevent);
     }
 
     public void deleteEvent(Event event) {
@@ -130,12 +126,17 @@ public class EventService {
 
     public Event updateEvent(Long id, Event event) {
 
+        System.out.println("create event");
 
-        event = invite(event);
+        if (event.getGuests() == null) {
+            event.setGuests(new ArrayList<>());
+            event.getGuests().add(event.getEventOwner());
+        }
 
+        var newevent = invite(event);
+        newevent.setId(id);
 
-        event.setId(id);
-        return eventRepository.save(event);
+        return eventRepository.save(newevent);
     }
 
     public Event addTask(Event event, Task task) {
@@ -168,15 +169,11 @@ public class EventService {
             event.setInvitations(new ArrayList<>());
         }
 
-        for (Invitation invitation : invitations) {
+        event.setInvitations(invitations);
 
-            //TODO fire invitation
-            if (!alreadyInvited(event, invitation)) {
-                event.getInvitations().add(invitation);
-            }
-        }
+        var newevent = invite(event);
 
-        return eventRepository.save(event);
+        return eventRepository.save(newevent);
     }
 
     public Event pushEventState(Event event) {
@@ -196,6 +193,10 @@ public class EventService {
             for (Task task : event.getTasks()) {
                 task.setTaskState(TaskState.IN_REVIEW);
             }
+        }
+
+        for (Task task : event.getTasks()) {
+            task.setTaskState(TaskState.READY_TO_START);
         }
 
         eventRepository.save(event);
@@ -241,7 +242,7 @@ public class EventService {
         EventDTO eventDto = modelMapper.map(event, EventDTO.class);
         eventDto.setTaskCount(event.getTasks() != null ? event.getTasks().size() : 0);
         eventDto.setReportsCount(event.getReports() != null ? event.getReports().size() : 0);
-        eventDto.setUsersCount(event.getGuests() != null ? event.getGuests().size() + 1 : 0);
+        eventDto.setUsersCount(event.getGuests() != null ? event.getGuests().size() : 0);
         eventDto.setInvitationsCount(event.getInvitations() != null ? event.getInvitations().size() : 0);
 
 
@@ -292,9 +293,14 @@ public class EventService {
 
                 event.setEventOwner(existingEvent.getEventOwner());
                 event.setGuests(existingEvent.getGuests());
-                event.setInvitations(existingEvent.getInvitations());
                 event.setReports(existingEvent.getReports());
                 event.setTasks(existingEvent.getTasks());
+
+                event.setInvitations(eventDTO.getInvitations() != null ? eventDTO.getInvitations()
+                        .stream()
+                        .map(invitation -> invitationService.convertToEntity(invitation))
+                        .collect(Collectors.toList()) : null);
+
 
             }
         }

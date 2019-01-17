@@ -1,6 +1,7 @@
 package gr.tei.erasmus.pp.eventmate.backend.resources;
 
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.TaskDTO;
+import gr.tei.erasmus.pp.eventmate.backend.config.Consts;
 import gr.tei.erasmus.pp.eventmate.backend.enums.ErrorType;
 import gr.tei.erasmus.pp.eventmate.backend.models.Task;
 import gr.tei.erasmus.pp.eventmate.backend.models.User;
@@ -43,16 +44,25 @@ public class TaskResource {
         Optional<Task> task = taskRepository.findById(id);
 
         if (task.isEmpty())
-            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.ENTITY_NOT_FOUND.statusCode))
+                    .build();
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!eventService.hasPermission(user, eventService.getParentEvent(task.get())))
-            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode))
+                    .build();
 
 
-        if (!taskService.hasPermission(user, task.get()))
-            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_TASK.statusCode);
+//        if (!taskService.hasPermission(user, task.get()))
+//            return ResponseEntity
+//                    .status(400)
+//                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.NO_PERMISSION_FOR_TASK.statusCode))
+//                    .build();
 
         return ResponseEntity.ok(taskService.convertToDto(task.get()));
     }
@@ -66,12 +76,18 @@ public class TaskResource {
         Optional<Task> taskOptional = taskRepository.findById(id);
 
         if (taskOptional.isEmpty())
-            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.ENTITY_NOT_FOUND.statusCode))
+                    .build();
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
-        if (!taskService.isOwner(user, taskOptional.get()) || !eventService.isOwner(user,eventService.getParentEvent(taskOptional.get())))
-            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_EDIT_TASK.statusCode);
+        if (!taskService.isOwner(user, taskOptional.get()))
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.NO_PERMISSION_FOR_EDIT_TASK.statusCode))
+                    .build();
 
 
         eventService.getParentEvent(taskOptional.get()).getTasks().remove(taskOptional.get());
@@ -87,20 +103,33 @@ public class TaskResource {
     @PutMapping("/task/{id}")
     public ResponseEntity<Object> updateTask(@RequestBody TaskDTO taskDto, @PathVariable long id) {
 
-        Task task = taskService.convertToEntity(taskDto);
+        System.out.println("get");
+        System.out.println(taskDto);
+
+        Task updateTask = taskService.convertToEntity(taskDto);
 
         Optional<Task> taskOptional = taskRepository.findById(id);
 
         if (taskOptional.isEmpty())
-            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.ENTITY_NOT_FOUND.statusCode))
+                    .build();
+
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
-        if (!taskService.isOwner(user, taskOptional.get()) || !eventService.isOwner(user,eventService.getParentEvent(taskOptional.get())))
-            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_EDIT_TASK.statusCode);
+        if (!taskService.isOwner(user, taskOptional.get()))
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.NO_PERMISSION_FOR_EDIT_TASK.statusCode))
+                    .build();
 
 
-        Task updatedTask = taskService.updateTask(taskOptional.get().getId(), task);
+        Task updatedTask = taskService.updateTask(taskOptional.get(), updateTask);
+
+        System.out.println("vracim");
+        System.out.println(taskService.convertToDto(updatedTask));
 
         return ResponseEntity.ok(taskService.convertToDto(updatedTask));
     }
@@ -112,15 +141,23 @@ public class TaskResource {
     @PostMapping("/task/{id}/pushState")
     public ResponseEntity<Object> pushState(@PathVariable long id) {
 
+        System.out.println(" pushState id = [" + id + "]");
+
         Optional<Task> taskOptional = taskRepository.findById(id);
 
         if (taskOptional.isEmpty())
-            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.ENTITY_NOT_FOUND.statusCode))
+                    .build();
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!taskService.isOwner(user, taskOptional.get()))
-            return ResponseEntity.status(400).body(ErrorType.USER_NOT_TASK_OWNER.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.USER_NOT_TASK_OWNER.statusCode))
+                    .build();
 
 
         Task savedTask = taskService.pushTaskState(taskOptional.get());

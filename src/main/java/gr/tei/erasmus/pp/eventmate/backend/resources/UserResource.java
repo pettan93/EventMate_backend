@@ -1,6 +1,7 @@
 package gr.tei.erasmus.pp.eventmate.backend.resources;
 
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.UserDTO;
+import gr.tei.erasmus.pp.eventmate.backend.config.Consts;
 import gr.tei.erasmus.pp.eventmate.backend.enums.ErrorType;
 import gr.tei.erasmus.pp.eventmate.backend.enums.InvitationState;
 import gr.tei.erasmus.pp.eventmate.backend.models.Event;
@@ -42,12 +43,39 @@ public class UserResource {
     public ResponseEntity<Object> registerNewUser(@RequestBody UserDTO user) {
 
         if(userService.isEmailUsed(user.getEmail()))
-            return ResponseEntity.status(400).body(ErrorType.EMAIL_ALREADY_USED.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER,String.valueOf(ErrorType.EMAIL_ALREADY_USED.statusCode))
+                    .build();
+
 
         User newUser = userService.register(userService.convertToEntity(user));
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(userService.convertToDto(newUser));
     }
+
+    @PostMapping("/public/login")
+    public ResponseEntity<Object> login(@RequestBody UserDTO user) {
+
+        if(!userService.isEmailUsed(user.getEmail())){
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER,String.valueOf(ErrorType.ENTITY_NOT_FOUND.statusCode))
+                    .build();
+        }
+
+        var result = userService.login(user.getEmail(),user.getPassword());
+
+        if(result.isEmpty())
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER,String.valueOf(ErrorType.BAD_PASSWORD.statusCode))
+                    .build();
+
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(userService.convertToDto(result.get()));
+    }
+
 
     @GetMapping("/public/users")
     public ResponseEntity<Object> getUsers() {
@@ -77,7 +105,10 @@ public class UserResource {
         User user = userService.getUserById(id);
 
         if(user == null)
-            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.ENTITY_NOT_FOUND.statusCode))
+                    .build();
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
@@ -130,7 +161,7 @@ public class UserResource {
         if (result.isEmpty())
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .build();
+                    .body(new ArrayList<>());
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
@@ -148,7 +179,10 @@ public class UserResource {
         Optional<Task> task = taskService.getById(id);
 
         if (task.isEmpty())
-            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.ENTITY_NOT_FOUND.statusCode))
+                    .build();
 
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
@@ -179,7 +213,10 @@ public class UserResource {
         var result = taskService.getUserTasks(user);
 
         if (event.isEmpty() || result.isEmpty())
-            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.ENTITY_NOT_FOUND.statusCode))
+                    .build();
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)

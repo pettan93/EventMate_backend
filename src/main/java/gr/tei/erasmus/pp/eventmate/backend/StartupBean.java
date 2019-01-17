@@ -26,32 +26,19 @@ public class StartupBean {
     @Value("${dev.dummyGenerator.enabled}")
     private Boolean dummyGeneratorEnabled;
 
-
-    private final TaskRepository taskRepository;
-
-    private final EventRepository eventRepository;
-    private final EventService eventService;
-
+    @Autowired
+    private TaskRepository taskRepository;
+    @Autowired
+    private EventRepository eventRepository;
+    @Autowired
+    private EventService eventService;
     @Autowired
     private ChatService chatService;
-
-
-    private final UserService userService;
-
+    @Autowired
+    private UserService userService;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-
-    @Autowired
-    public StartupBean(TaskRepository taskRepository,
-                       EventRepository eventRepository,
-                       EventService eventService,
-                       UserService userService) {
-        this.taskRepository = taskRepository;
-        this.eventRepository = eventRepository;
-        this.eventService = eventService;
-        this.userService = userService;
-    }
 
     @PostConstruct
     public void init() {
@@ -69,9 +56,118 @@ public class StartupBean {
         User user3 = new User("user3", "user3@email", "pass", null, 0);
         User user4 = new User("user4", "user4@email", "pass", null, 0);
 
+        User petra_user = new User("petra", "petra@email", "petra1", null, 0);
+        User petan_user = new User("petan", "petan@email", "petan1", null, 0);
+
+        petra_user.setPhoto(FileUtils.getFileBlob(new File("petra.jpg")));
+        petan_user.setPhoto(FileUtils.getFileBlob(new File("petan.jpg")));
         user1.setPhoto(FileUtils.getFileBlob(new File("blank.jpg")));
 
-        userService.register(Arrays.asList(user1, user2, user3, user4));
+        userService.register(Arrays.asList(user1, user2, user3, user4, petra_user, petan_user));
+
+        Task task_petra = new Task(
+                "Petra task",
+                "Bar",
+                "Drink 10 rakia shots",
+                10L,
+                null,
+                petra_user,
+                TaskState.EDITABLE
+        );
+        Task task_petra2 = new Task(
+                "Rum shots",
+                "Bar",
+                "Drink 10 rum shots",
+                10L,
+                null
+        );
+
+        task_petra2.setPhoto(FileUtils.getFileBlob(new File("blank.jpg")));
+        task_petra2.setTaskState(TaskState.READY_TO_START);
+        task_petra2.setTaskOwner(petra_user);
+        task_petra2.setAssignees(Arrays.asList(user1, user2));
+
+        Task task_petra3 = new Task(
+                "Vodka shots",
+                "Bar",
+                "Drink 10 vodka shots",
+                10L,
+                null
+        );
+        task_petra3.setPhoto(FileUtils.getFileBlob(new File("blank.jpg")));
+        task_petra3.setTaskState(TaskState.IN_REVIEW);
+        task_petra3.setTaskOwner(petra_user);
+        task_petra3.setAssignees(Arrays.asList(user1, user2));
+
+        Event petra_event = new Event(
+                "Petra event",
+                new Date(),
+                "Pub 321",
+                new ArrayList<>(Arrays.asList(task_petra, task_petra2, task_petra3)),
+                EventState.EDITABLE,
+                new ArrayList<>());
+        petra_event.setEventOwner(petra_user);
+        petra_event.setGuests(new ArrayList<>(Arrays.asList(user1, user2, petan_user)));
+
+        eventService.createEvent(petra_user, petra_event);
+
+
+        Task task_petra_in_play = new Task(
+                "Rozehrany",
+                "Bar",
+                "Drink 10 vodka shots",
+                10L,
+                null
+        );
+        task_petra_in_play.setPhoto(FileUtils.getFileBlob(new File("blank.jpg")));
+        task_petra_in_play.setTaskState(TaskState.IN_PLAY);
+        task_petra_in_play.setTaskOwner(petan_user);
+        task_petra_in_play.setAssignees(Arrays.asList(user1, user2, petan_user));
+
+        var sbfa1 = new SubmissionFile();
+        sbfa1.setData(FileUtils.getFileBlob(new File("blank.jpg")));
+        sbfa1.setType(FileType.PHOTO);
+        sbfa1.setCreated(new Date());
+
+        var submissiona1 = new Submission();
+        submissiona1.setSubmitter(user2);
+        submissiona1.setContent(Collections.singletonList(sbfa1));
+
+        task_petra_in_play.setSubmissions(Arrays.asList(submissiona1));
+
+        Event petra_event_in_play = new Event(
+                "Hrajeme",
+                new Date(),
+                "Pub 321",
+                new ArrayList<>(Arrays.asList(task_petra_in_play)),
+                EventState.IN_PLAY,
+                new ArrayList<>());
+        petra_event_in_play.setEventOwner(petra_user);
+        petra_event_in_play.setGuests(new ArrayList<>(Arrays.asList(user1, user2, petan_user)));
+
+        eventService.createEvent(petra_user, petra_event_in_play);
+
+
+        Task task_petan = new Task(
+                "Petan task",
+                "Bar",
+                "Drink 10 rakia shots",
+                10L,
+                null,
+                petan_user,
+                TaskState.EDITABLE
+        );
+        Event petan_event = new Event(
+                "Petan event",
+                new Date(),
+                "Pub 321",
+                Collections.singletonList(task_petan),
+                EventState.EDITABLE,
+                new ArrayList<>());
+        petan_event.setEventOwner(petan_user);
+        petan_event.setGuests(new ArrayList<>(Arrays.asList(user1, user2, petra_user)));
+        eventService.createEvent(petan_user, petan_event);
+
 
         Date date1 = DateUtils.toDate(LocalDateTime.now()
                 .plusDays(2)
@@ -183,7 +279,7 @@ public class StartupBean {
 
         var submission2 = new Submission();
         submission2.setSubmitter(user2);
-        submission2.setContent(Arrays.asList(sbf2,sbf3));
+        submission2.setContent(Arrays.asList(sbf2, sbf3));
 
         var submission3 = new Submission();
         submission3.setSubmitter(user3);
@@ -192,14 +288,10 @@ public class StartupBean {
         submission2.setEarnedPoints(5);
         submission3.setEarnedPoints(8);
 
-        System.out.println(submission1);
-        System.out.println(submission2);
-        System.out.println(submission3);
-
-        task4.setSubmissions(Arrays.asList(submission2,submission3));
+        task4.setSubmissions(Arrays.asList(submission2, submission3));
 
 
-        event1.getTasks().addAll(Arrays.asList(task1,task2,task3,task4));
+        event1.getTasks().addAll(Arrays.asList(task1, task2, task3, task4));
 
 
         eventRepository.save(event1);
@@ -240,8 +332,6 @@ public class StartupBean {
         submission4.setSubmitter(user2);
         submission4.setContent(Collections.singletonList(sbf5));
         submission4.setEarnedPoints(40);
-
-        submission4.setContent(Collections.singletonList(sbf5));
 
         task5.setSubmissions(Arrays.asList(submission4));
 
@@ -288,20 +378,35 @@ public class StartupBean {
         eventRepository.save(event2);
 
 
-        chatService.sendMessage(new ChatMessage(user1,user2,"ahoj"));
-        chatService.sendMessage(new ChatMessage(user1,user2,"jak se mas?"));
-        chatService.sendMessage(new ChatMessage(user1,user2,"ses tam?"));
+        chatService.sendMessage(new ChatMessage(user1, user2, "ahoj"));
+        chatService.sendMessage(new ChatMessage(user1, user2, "jak se mas?"));
+        chatService.sendMessage(new ChatMessage(user1, user2, "ses tam?"));
 
-        chatService.sendMessage(new ChatMessage(user1,user3,"user 2 me ignoruje"));
-        chatService.sendMessage(new ChatMessage(user1,user3,":("));
-        chatService.sendMessage(new ChatMessage(user1,user3,"LAST"));
+        chatService.sendMessage(new ChatMessage(user1, user3, "user 2 me ignoruje"));
+        chatService.sendMessage(new ChatMessage(user1, user3, ":("));
+        chatService.sendMessage(new ChatMessage(user1, user3, "LAST"));
 
-        chatService.sendMessage(new ChatMessage(user3,user2,"odpovez mu vole"));
-        chatService.sendMessage(new ChatMessage(user3,user2,"LAST"));
+        chatService.sendMessage(new ChatMessage(user3, user2, "odpovez mu vole"));
+        chatService.sendMessage(new ChatMessage(user3, user2, "LAST"));
 
-        chatService.sendMessage(new ChatMessage(user2,user1,"ahoj, jo jsem"));
-        chatService.sendMessage(new ChatMessage(user2,user1,"mam se fajn"));
-        chatService.sendMessage(new ChatMessage(user2,user1,"LAST"));
+        chatService.sendMessage(new ChatMessage(user2, user1, "ahoj, jo jsem"));
+        chatService.sendMessage(new ChatMessage(user2, user1, "mam se fajn"));
+        chatService.sendMessage(new ChatMessage(user2, user1, "LAST"));
+
+        chatService.sendMessage(new ChatMessage(petra_user, petan_user, "ahoj"));
+        chatService.sendMessage(new ChatMessage(petra_user, petan_user, "jak se mas?"));
+        chatService.sendMessage(new ChatMessage(petra_user, petan_user, "ses tam?"));
+
+        chatService.sendMessage(new ChatMessage(petra_user, user3, "user 2 me ignoruje"));
+        chatService.sendMessage(new ChatMessage(petra_user, user3, ":("));
+
+        chatService.sendMessage(new ChatMessage(petan_user, petra_user, "ahoj, jo jsem OK"));
+
+        chatService.sendMessage(new ChatMessage(user2, petra_user, "PARTYYYYYYYYYYY"));
+        chatService.sendMessage(new ChatMessage(user2, petra_user, "you comming?"));
+        chatService.sendMessage(new ChatMessage(user2, petra_user, "HURRY PU"));
+
+
 
 
         Event event3 = new Event(
@@ -337,7 +442,103 @@ public class StartupBean {
         event5.setEventOwner(user1);
         eventRepository.save(event5);
 
+
+        createPromoEvent();
     }
 
+
+    public  void createPromoEvent() {
+
+        User tom = new User("Tom", "tom@email", "passpass", FileUtils.getFileBlob(new File("promo/photos/tom.png")), 30);
+        User george = new User("George", "george@email", "passpass", FileUtils.getFileBlob(new File("promo/photos/george.png")), 150);
+        User alice = new User("Alice", "alice@email", "passpass", FileUtils.getFileBlob(new File("promo/photos/alice.png")), 400);
+        User maria = new User("Maria", "maria@email", "passpass", FileUtils.getFileBlob(new File("promo/photos/maria.png")), 20);
+        User mario = new User("Mario", "mario@email", "passpass", FileUtils.getFileBlob(new File("promo/photos/mario.png")), 0);
+
+        userService.register(Arrays.asList(tom,george,alice,maria,mario));
+
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -7);
+
+
+        var shoots_proof_photo = new SubmissionFile();
+        shoots_proof_photo.setData(FileUtils.getFileBlob(new File("promo/shoots_proof.jpg")));
+        shoots_proof_photo.setType(FileType.PHOTO);
+        shoots_proof_photo.setCreated(new Date());
+        shoots_proof_photo.setName("Look at it!");
+        shoots_proof_photo.setComment("Almost did it 9/10");
+
+
+        var shoots_proof = new Submission();
+        shoots_proof.setSubmitter(tom);
+        shoots_proof.setContent(Arrays.asList(shoots_proof_photo));
+        shoots_proof.setEarnedPoints(8);
+
+        Task stag_rakia_shots = new Task(
+                "Rakia shots",
+                "Meraki pub",
+                "Drink 10 rakia shots in row",
+                10L,
+                Collections.singletonList(shoots_proof)
+        );
+        stag_rakia_shots.setPhoto(FileUtils.getFileBlob(new File("promo/panaky.jpg")));
+        stag_rakia_shots.setTaskState(TaskState.FINISHED);
+        stag_rakia_shots.setTaskOwner(george);
+        stag_rakia_shots.setAssignees(Collections.singletonList(tom));
+
+
+
+        var kiss_proof = new SubmissionFile();
+        kiss_proof.setData(FileUtils.getFileBlob(new File("promo/kiss_proof.jpg")));
+        kiss_proof.setType(FileType.PHOTO);
+        kiss_proof.setCreated(new Date());
+        kiss_proof.setName("Look at it!");
+        kiss_proof.setComment("Yeah, I did.");
+
+        var tom_kiss_submission = new Submission();
+        tom_kiss_submission.setSubmitter(tom);
+        tom_kiss_submission.setContent(Collections.singletonList(kiss_proof));
+        tom_kiss_submission.setEarnedPoints(20);
+
+        Task stag_kiss_bartender = new Task(
+                "Kiss a bartender",
+                "Meraki pub",
+                "Tom, you always liked her.",
+                20L,
+                Collections.singletonList(tom_kiss_submission)
+        );
+        stag_kiss_bartender.setPhoto(FileUtils.getFileBlob(new File("promo/kiss.jpg")));
+        stag_kiss_bartender.setTaskState(TaskState.FINISHED);
+        stag_kiss_bartender.setTaskOwner(george);
+        stag_kiss_bartender.setAssignees(Collections.singletonList(tom));
+
+
+
+        Event stag_party = new Event(
+                "Tom stag party",
+                cal.getTime(),
+                "Meraki pub",
+                new ArrayList<>(Arrays.asList(stag_rakia_shots,stag_kiss_bartender)),
+                EventState.FINISHED,
+                new ArrayList<>());
+
+        stag_party.setPhoto(FileUtils.getFileBlob(new File("promo/stag_party.png")));
+        stag_party.setGuests(new ArrayList<>(Arrays.asList(tom,george,maria)));
+
+
+        eventService.createEvent(george,stag_party);
+
+
+
+
+        //messaging
+
+        chatService.sendMessage(new ChatMessage(tom, george, "Hi George!"));
+        chatService.sendMessage(new ChatMessage(tom, george, "How are you?"));
+        chatService.sendMessage(new ChatMessage(george, tom, "I'm fine, and you?"));
+
+
+
+    }
 
 }

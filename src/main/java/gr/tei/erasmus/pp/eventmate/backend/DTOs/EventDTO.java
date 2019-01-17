@@ -175,7 +175,7 @@ public class EventDTO {
                 ", state=" + state +
                 ", reports=" + reports +
                 ", invitations=" + invitations +
-                ", photo=" + photo +
+//                ", photo=" + photo +
                 ", taskCount=" + taskCount +
                 ", reportsCount=" + reportsCount +
                 ", usersCount=" + usersCount +

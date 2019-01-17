@@ -4,6 +4,7 @@ import gr.tei.erasmus.pp.eventmate.backend.enums.EventState;
 
 import javax.persistence.*;
 import java.sql.Blob;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -52,6 +53,7 @@ public class Event {
         this.tasks = tasks;
         this.state = state;
         this.reports = reports;
+        this.guests = new ArrayList<>();
     }
 
 
@@ -157,7 +159,7 @@ public class Event {
                 ", eventOwner=" + eventOwner +
                 ", guests=" + guests +
                 ", invitations=" + invitations +
-                ", photo=" + photo +
+//                ", photo=" + photo +
                 '}';
     }
 }

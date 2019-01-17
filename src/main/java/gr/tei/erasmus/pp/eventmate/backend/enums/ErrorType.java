@@ -1,6 +1,7 @@
 package gr.tei.erasmus.pp.eventmate.backend.enums;
 
 public enum ErrorType {
+    BAD_PASSWORD(3999),
     ENTITY_NOT_FOUND(4000),
     NO_REPORTS_IN_EVENT(4017),
     NO_SUBMISSION(4014),
@@ -29,6 +30,7 @@ public enum ErrorType {
     EVENT_NOT_IN_FINISHED_STATE(4011),
 
     MORE_POINTS_THAN_ALLOWED(4016);
+
 
     ErrorType(int statusCode) {
         this.statusCode = statusCode;

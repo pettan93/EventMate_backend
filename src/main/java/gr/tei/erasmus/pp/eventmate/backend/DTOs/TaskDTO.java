@@ -1,5 +1,6 @@
 package gr.tei.erasmus.pp.eventmate.backend.DTOs;
 
+import gr.tei.erasmus.pp.eventmate.backend.enums.EventState;
 import gr.tei.erasmus.pp.eventmate.backend.enums.TaskState;
 
 import javax.persistence.GeneratedValue;
@@ -26,6 +27,8 @@ public class TaskDTO {
     private String photo;
 
     private TaskState taskState;
+
+    private EventState parentEventState;
 
     private Boolean timeLimited;
 
@@ -83,9 +86,15 @@ public class TaskDTO {
         this.timeLimit = timeLimit;
     }
 
+    public EventState getParentEventState() {
+        return parentEventState;
+    }
+
+    public void setParentEventState(EventState parentEventState) {
+        this.parentEventState = parentEventState;
+    }
+
     /************/
-
-
 
 
     public Long getId() {
@@ -166,5 +175,26 @@ public class TaskDTO {
 
     public void setAssignees(List<UserDTO> assignees) {
         this.assignees = assignees;
+    }
+
+    @Override
+    public String toString() {
+        return "TaskDTO{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", photo='" + (photo != null ? photo.length() : "none") + '\'' +
+                ", place='" + place + '\'' +
+                ", description='" + description + '\'' +
+                ", points=" + points +
+                ", submissions=" + submissions +
+                ", taskState=" + taskState +
+                ", timeLimited=" + timeLimited +
+                ", remainingTime=" + remainingTime +
+                ", timeLimit=" + timeLimit +
+                ", submissionsCount=" + submissionsCount +
+                ", eventId=" + eventId +
+                ", taskOwner=" + taskOwner +
+                ", assignees=" + assignees +
+                '}';
     }
 }

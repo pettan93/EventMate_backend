@@ -144,8 +144,9 @@ public class SubmissionService {
 
     public Task assignPoints(Task task, Submission submission, Long points) {
 
-        submission.setEarnedPoints(Long.valueOf(points).intValue());
+        System.out.println("assign !!!!!!!!");
 
+        submission.setEarnedPoints(Long.valueOf(points).intValue());
 
         submissionRepository.save(submission);
 
@@ -172,6 +173,8 @@ public class SubmissionService {
         submissionDto.setTaskDescription(parentTask.getDescription());
         submissionDto.setTaskPhoto(FileUtils.getEncodedStringFromBlob(parentTask.getPhoto()));
         submissionDto.setMaxPoints(parentTask.getPoints().intValue());
+
+        submissionDto.setParentTaskId(parentTask.getId());
 
         if (submission.getContent() != null && submission.getContent().size() > 0) {
             List<SubmissionFileDTO> filesDtos = submission.getContent()

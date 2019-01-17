@@ -18,6 +18,15 @@ public class ReportResponseDTO {
 
     private String preview;
 
+    private String content;
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
 
     public Long getId() {
         return id;

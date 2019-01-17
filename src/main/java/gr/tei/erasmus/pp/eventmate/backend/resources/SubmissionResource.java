@@ -1,6 +1,7 @@
 package gr.tei.erasmus.pp.eventmate.backend.resources;
 
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.SubmissionDTO;
+import gr.tei.erasmus.pp.eventmate.backend.config.Consts;
 import gr.tei.erasmus.pp.eventmate.backend.enums.ErrorType;
 import gr.tei.erasmus.pp.eventmate.backend.enums.TaskState;
 import gr.tei.erasmus.pp.eventmate.backend.models.*;
@@ -36,15 +37,24 @@ public class SubmissionResource {
 
     @GetMapping("/task/{id}/submission/{userId}")
     public ResponseEntity<Object> getTaskSubmissions(@PathVariable long id, @PathVariable long userId) {
+
+
+
         Optional<Task> task = taskService.getById(id);
 
         if (task.isEmpty())
-            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.ENTITY_NOT_FOUND.statusCode))
+                    .build();
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!eventService.hasPermission(user, eventService.getParentEvent(task.get())))
-            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode))
+                    .build();
 
 
         return ResponseEntity
@@ -62,25 +72,44 @@ public class SubmissionResource {
     public ResponseEntity<Object> saveSubmission(@PathVariable long id,
                                                  @RequestBody SubmissionDTO submissionDTO) {
 
+        System.out.println("saveSubmission submissionDTO:");
+        System.out.println(submissionDTO);
+
         Optional<Task> taskOptional = taskService.getById(id);
 
         if (taskOptional.isEmpty())
-            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.ENTITY_NOT_FOUND.statusCode))
+                    .build();
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!eventService.hasPermission(user, eventService.getParentEvent(taskOptional.get())))
-            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode))
+                    .build();
 
         if (!taskService.isUserAssignee(taskOptional.get(), user))
-            return ResponseEntity.status(400).body(ErrorType.USER_NOT_TASK_ASSIGNEE.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.USER_NOT_TASK_ASSIGNEE.statusCode))
+                    .build();
 
         if (!taskService.isTaskInState(taskOptional.get(), TaskState.IN_PLAY))
-            return ResponseEntity.status(400).body(ErrorType.TASK_IS_NOT_IN_PLAYABLE_STATE.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.TASK_IS_NOT_IN_PLAYABLE_STATE.statusCode))
+                    .build();
+
 
         submissionDTO.setSubmitter(userService.convertToDto(user));
 
         var savedTask = submissionService.addTaskSubmission(taskOptional.get(), submissionService.convertToEntity(submissionDTO));
+
+
+        System.out.println("Returning task" + taskService.convertToDto(savedTask));
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(taskService.convertToDto(savedTask));
     }
@@ -91,21 +120,33 @@ public class SubmissionResource {
         Optional<Submission> submissionOptional = submissionRepository.findById(id);
 
         if (submissionOptional.isEmpty())
-            return ResponseEntity.notFound().build();
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.ENTITY_NOT_FOUND.statusCode))
+                    .build();
 
         var parentTask = submissionService.getParentTask(submissionOptional.get());
         var parentEvent = eventService.getParentEvent(parentTask);
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
-        if (!eventService.isOwner(user, parentEvent) || !taskService.isOwner(user, parentTask))
-            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_ASSIGN_POINTS.statusCode);
+        if (!eventService.isOwner(user, parentEvent))
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.NO_PERMISSION_FOR_ASSIGN_POINTS.statusCode))
+                    .build();
 
-        if (!taskService.isTaskInState(parentTask,TaskState.IN_REVIEW))
-            return ResponseEntity.status(400).body(ErrorType.TASK_IS_NOT_IN_REVIEW_STATE.statusCode);
+        if (!taskService.isTaskInState(parentTask, TaskState.IN_REVIEW))
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.TASK_IS_NOT_IN_REVIEW_STATE.statusCode))
+                    .build();
 
         if (points > parentTask.getPoints())
-            return ResponseEntity.status(400).body(ErrorType.MORE_POINTS_THAN_ALLOWED.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.MORE_POINTS_THAN_ALLOWED.statusCode))
+                    .build();
 
         var submission = submissionOptional.get();
 
@@ -117,7 +158,7 @@ public class SubmissionResource {
 
     @PostMapping("/task/{id}/assignPoints")
     public ResponseEntity<Object> assignPoints(@PathVariable long id,
-                                                 @RequestBody List<UserSubmissionPoints> points) {
+                                               @RequestBody List<UserSubmissionPoints> points) {
 
         Optional<Task> taskOptional = taskService.getById(id);
 
@@ -125,27 +166,43 @@ public class SubmissionResource {
 
 
         if (taskOptional.isEmpty())
-            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.ENTITY_NOT_FOUND.statusCode))
+                    .build();
 
-       if (!eventService.hasPermission(user, eventService.getParentEvent(taskOptional.get())))
-           return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode);
+        if (!eventService.hasPermission(user, eventService.getParentEvent(taskOptional.get())))
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode))
+                    .build();
 
         if (!taskService.isTaskInState(taskOptional.get(), TaskState.IN_REVIEW))
-            return ResponseEntity.status(400).body(ErrorType.TASK_IS_NOT_IN_REVIEW_STATE.statusCode);
+        return ResponseEntity
+                .status(400)
+                .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.TASK_IS_NOT_IN_REVIEW_STATE.statusCode))
+                .build();
 
-        if(!taskService.isOwner(user,taskOptional.get()) || !eventService.isOwner(user,eventService.getParentEvent(taskOptional.get()))){
-            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_ASSIGN_POINTS.statusCode);
+        if (!taskService.isOwner(user, taskOptional.get())) {
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.NO_PERMISSION_FOR_ASSIGN_POINTS.statusCode))
+                    .build();
         }
 
         for (UserSubmissionPoints point : points) {
-            if(point.getPoints() > taskOptional.get().getPoints()){
+            if (point.getPoints() > taskOptional.get().getPoints()) {
                 return ResponseEntity.status(400).body(ErrorType.MORE_POINTS_THAN_ALLOWED.statusCode);
             }
         }
 
-        submissionService.assignPoints(taskOptional.get(),points);
+        submissionService.assignPoints(taskOptional.get(), points);
 
-        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+
+        taskService.pushTaskState(taskOptional.get());
+
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(taskService.convertToDto(taskOptional.get()));
 
     }
 

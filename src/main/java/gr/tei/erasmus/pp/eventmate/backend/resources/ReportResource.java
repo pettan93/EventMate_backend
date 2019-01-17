@@ -2,6 +2,7 @@ package gr.tei.erasmus.pp.eventmate.backend.resources;
 
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.EmailDTO;
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.ReportRequestDTO;
+import gr.tei.erasmus.pp.eventmate.backend.config.Consts;
 import gr.tei.erasmus.pp.eventmate.backend.enums.ErrorType;
 import gr.tei.erasmus.pp.eventmate.backend.models.Event;
 import gr.tei.erasmus.pp.eventmate.backend.models.Report;
@@ -49,16 +50,26 @@ public class ReportResource {
         Optional<Event> event = eventRepository.findById(id);
 
         if (event.isEmpty())
-            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.ENTITY_NOT_FOUND.statusCode))
+                    .build();
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!eventService.hasPermission(user, event.get()))
-            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode))
+                    .build();
 
 
         if (!reportService.hasEventAnyReports(event.get()))
-            return ResponseEntity.status(400).body(ErrorType.NO_REPORTS_IN_EVENT.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.NO_REPORTS_IN_EVENT.statusCode))
+                    .build();
+
 
         return ResponseEntity.ok(reportService.getEventReports(event.get())
                 .stream()
@@ -75,12 +86,19 @@ public class ReportResource {
         Optional<Report> report = reportService.getReportById(id);
 
         if (report.isEmpty())
-            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.ENTITY_NOT_FOUND.statusCode))
+                    .build();
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!eventService.hasPermission(user, eventService.getParentEvent(report.get())))
-            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode))
+                    .build();
+
 
         return ResponseEntity.ok(reportService.convertToDto(report.get()));
     }
@@ -97,18 +115,27 @@ public class ReportResource {
         Optional<Event> eventOptional = eventRepository.findById(id);
 
         if (eventOptional.isEmpty())
-            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.ENTITY_NOT_FOUND.statusCode))
+                    .build();
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!eventService.hasPermission(user, eventOptional.get()))
-            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.NO_PERMISSION_FOR_EVENT.statusCode))
+                    .build();
 
         if (!reportService.isEventInReportableState(eventOptional.get()))
-            return ResponseEntity.status(400).body(ErrorType.EVENT_NOT_IN_FINISHED_STATE.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.EVENT_NOT_IN_FINISHED_STATE.statusCode))
+                    .build();
 
 
-        report = reportService.generateReport(report,reportDTO,eventOptional.get(),user);
+        report = reportService.generateReport(report, reportDTO, eventOptional.get(), user);
 
         var editedReport = reportService.addReportToEvent(eventOptional.get(), report);
 
@@ -121,7 +148,10 @@ public class ReportResource {
         Optional<Report> report = reportService.getReportById(id);
 
         if (report.isEmpty())
-            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.ENTITY_NOT_FOUND.statusCode))
+                    .build();
 
         emailService.sendMessageWithAttachment(report.get(), emailDTO);
 
@@ -134,12 +164,19 @@ public class ReportResource {
         Optional<Report> reportOptional = reportService.getReportById(id);
 
         if (reportOptional.isEmpty())
-            return ResponseEntity.status(400).body(ErrorType.ENTITY_NOT_FOUND.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.ENTITY_NOT_FOUND.statusCode))
+                    .build();
 
         User user = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
 
         if (!(eventService.isOwner(user, eventService.getParentEvent(reportOptional.get())) || reportService.isReportCreator(reportOptional.get(), user)))
-            return ResponseEntity.status(400).body(ErrorType.NO_PERMISSION_FOR_DELETE_REPORT.statusCode);
+            return ResponseEntity
+                    .status(400)
+                    .header(Consts.ERROR_HEADER, String.valueOf(ErrorType.NO_PERMISSION_FOR_DELETE_REPORT.statusCode))
+                    .build();
+
 
         var parentEvent = eventService.getParentEvent(reportOptional.get());
         parentEvent.getReports().remove(reportOptional.get());

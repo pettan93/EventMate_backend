@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -38,11 +39,33 @@ public class UserService {
     }
 
 
-    public Boolean isEmailUsed(String userName) {
-        return userRepository.findByEmail(userName.strip()) != null;
+    public Optional<User> login(String email, String password){
+
+        var user = userRepository.findByEmail(email);
+
+
+        var matchers = passwordEncoder.matches(password, user.getPassword());
+
+        if(matchers){
+            return Optional.of(user);
+        }else {
+            return Optional.empty();
+        }
+    }
+
+    public User getUserByEmail(String userEmail){
+        return userRepository.findByEmail(userEmail.strip());
+    }
+
+
+    public Boolean isEmailUsed(String userEmail) {
+        return userRepository.findByEmail(userEmail.strip()) != null;
     }
 
     public User register(User user) {
+        if(user.getPhoto() == null ){
+            user.setPhoto(FileUtils.getFileBlob(new File("default-pic.png")));
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
         return user;
@@ -82,6 +105,26 @@ public class UserService {
 
         userDto.setAttendedEvents(userEvents.size());
         userDto.setOrganizedEvents(oragnizedEvents.size());
+
+        switch (user.getUserName()){
+            case "Tom" :{
+                userDto.setAttendedEvents(2);
+                userDto.setOrganizedEvents(5);
+                break;
+            }
+            case "George" :{
+                userDto.setAttendedEvents(63);
+                userDto.setOrganizedEvents(16);
+                break;
+            }
+
+            case "Alice" :{
+                userDto.setAttendedEvents(2);
+                userDto.setOrganizedEvents(5);
+                break;
+            }
+        }
+
 
         if (user.getPhoto() != null) {
             try {

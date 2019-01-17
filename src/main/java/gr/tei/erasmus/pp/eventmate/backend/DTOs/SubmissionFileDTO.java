@@ -65,4 +65,16 @@ public class SubmissionFileDTO {
     public void setData(String data) {
         this.data = data;
     }
+
+    @Override
+    public String toString() {
+        return "SubmissionFileDTO{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", comment='" + comment + '\'' +
+                ", type=" + type +
+                ", created=" + created +
+                ", data='" + (data != null ? data.length() + "" : "none") + '\'' +
+                '}';
+    }
 }

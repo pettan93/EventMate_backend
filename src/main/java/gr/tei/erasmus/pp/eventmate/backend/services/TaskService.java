@@ -11,6 +11,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,7 +39,7 @@ public class TaskService {
         return task.getTaskOwner().equals(user);
     }
 
-    public Task saveTask(Task task){
+    public Task saveTask(Task task) {
         return taskRepository.save(task);
     }
 
@@ -46,17 +48,17 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
-    public Optional<Task> getById(long id){
+    public Optional<Task> getById(long id) {
         return taskRepository.findById(id);
     }
 
 
-    public Boolean isTaskInState(Task task,TaskState state){
+    public Boolean isTaskInState(Task task, TaskState state) {
         return task.getTaskState().equals(state);
     }
 
 
-    public Boolean isUserAssignee(Task task, User user){
+    public Boolean isUserAssignee(Task task, User user) {
         return task.getAssignees().contains(user);
     }
 
@@ -69,7 +71,7 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
-    public void deleteTask(Task task){
+    public void deleteTask(Task task) {
         taskRepository.delete(task);
     }
 
@@ -79,9 +81,18 @@ public class TaskService {
                 .collect(Collectors.toList());
     }
 
-    public Task updateTask(Long id, Task task) {
-        task.setId(id);
-        return taskRepository.save(task);
+    public Task updateTask(Task original, Task newTask) {
+        newTask.setId(original.getId());
+        newTask.setTaskState(original.getTaskState());
+
+
+        HashSet hs = new HashSet(newTask.getAssignees());  // willl not add the duplicate values
+        newTask.getAssignees().clear();
+        newTask.getAssignees().addAll(hs);
+
+        newTask.setSubmissions(new ArrayList<>());
+
+        return taskRepository.save(newTask);
     }
 
     public Task pushTaskState(Task task) {
@@ -93,7 +104,7 @@ public class TaskService {
         return task;
     }
 
-    public List<Task> getAllTasks(){
+    public List<Task> getAllTasks() {
         return taskRepository.findAll();
     }
 
@@ -131,6 +142,8 @@ public class TaskService {
 
         taskDto.setEventId(eventService.getParentEvent(task).getId());
 
+        taskDto.setParentEventState(eventService.getParentEvent(task).getState());
+
         if (task.getPhoto() != null) {
             try {
                 taskDto.setPhoto(FileUtils.getEncodedStringFromBlob(task.getPhoto()));
@@ -155,11 +168,8 @@ public class TaskService {
 
                 task.setTaskOwner(existingTask.getTaskOwner());
                 task.setSubmissions(existingTask.getSubmissions());
-
-
             }
         }
-
 
         if (taskDto.getPhoto() != null) {
             try {
