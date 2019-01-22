@@ -2,6 +2,7 @@ package gr.tei.erasmus.pp.eventmate.backend.services;
 
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.PlainTaskDTO;
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.TaskDTO;
+import gr.tei.erasmus.pp.eventmate.backend.DTOs.TaskLightDTO;
 import gr.tei.erasmus.pp.eventmate.backend.enums.TaskState;
 import gr.tei.erasmus.pp.eventmate.backend.models.Task;
 import gr.tei.erasmus.pp.eventmate.backend.models.User;
@@ -137,6 +138,34 @@ public class TaskService {
                 .stream()
                 .map(submission -> submissionService.convertToDto(submission))
                 .collect(Collectors.toList()) : null);
+
+        taskDto.setTaskOwner(userService.convertToDto(task.getTaskOwner()));
+
+        taskDto.setEventId(eventService.getParentEvent(task).getId());
+
+        taskDto.setParentEventState(eventService.getParentEvent(task).getState());
+
+        if (task.getPhoto() != null) {
+            try {
+                taskDto.setPhoto(FileUtils.getEncodedStringFromBlob(task.getPhoto()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return taskDto;
+    }
+
+    public TaskLightDTO convertToLightDto(Task task) {
+
+        TaskLightDTO taskDto = modelMapper.map(task, TaskLightDTO.class);
+        taskDto.setSubmissionsCount(task.getSubmissions() != null ? task.getSubmissions().size() : 0);
+
+        taskDto.setAssignees(task.getAssignees() != null ? task.getAssignees()
+                .stream()
+                .map(assignee -> userService.convertToDto(assignee))
+                .collect(Collectors.toList()) : null);
+
 
         taskDto.setTaskOwner(userService.convertToDto(task.getTaskOwner()));
 

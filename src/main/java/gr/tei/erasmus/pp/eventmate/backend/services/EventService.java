@@ -1,6 +1,7 @@
 package gr.tei.erasmus.pp.eventmate.backend.services;
 
 import gr.tei.erasmus.pp.eventmate.backend.DTOs.EventDTO;
+import gr.tei.erasmus.pp.eventmate.backend.DTOs.EventLightDTO;
 import gr.tei.erasmus.pp.eventmate.backend.enums.EventState;
 import gr.tei.erasmus.pp.eventmate.backend.enums.InvitationType;
 import gr.tei.erasmus.pp.eventmate.backend.enums.TaskState;
@@ -256,6 +257,48 @@ public class EventService {
                 .stream()
                 .map(task -> taskService.convertToDto(task))
                 .collect(Collectors.toList()) : null);
+
+        eventDto.setInvitations(event.getInvitations() != null ? event.getInvitations()
+                .stream()
+                .map(invitation -> invitationService.convertToDto(invitation))
+                .collect(Collectors.toList()) : null);
+
+        eventDto.setReports(event.getReports() != null ? event.getReports()
+                .stream()
+                .map(report -> reportService.convertToDto(report))
+                .collect(Collectors.toList()) : null);
+
+        if (event.getPhoto() != null) {
+            try {
+
+                eventDto.setPhoto(FileUtils.getEncodedStringFromBlob(event.getPhoto()));
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return eventDto;
+    }
+
+
+
+    public EventLightDTO convertToLightDto(Event event) {
+
+        EventLightDTO eventDto = modelMapper.map(event, EventLightDTO.class);
+        eventDto.setTaskCount(event.getTasks() != null ? event.getTasks().size() : 0);
+        eventDto.setReportsCount(event.getReports() != null ? event.getReports().size() : 0);
+        eventDto.setUsersCount(event.getGuests() != null ? event.getGuests().size() : 0);
+        eventDto.setInvitationsCount(event.getInvitations() != null ? event.getInvitations().size() : 0);
+
+
+        eventDto.setEventOwner(userService.convertToDto(event.getEventOwner()));
+        eventDto.setGuests(event.getGuests() != null ? event.getGuests()
+                .stream()
+                .map(guest -> userService.convertToDto(guest))
+                .collect(Collectors.toList()) : null);
+
+
 
         eventDto.setInvitations(event.getInvitations() != null ? event.getInvitations()
                 .stream()

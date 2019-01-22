@@ -21,6 +21,12 @@ public class Submission {
     public Submission() {
     }
 
+    public Submission(List<SubmissionFile> content, User submitter, Integer earnedPoints) {
+        this.content = content;
+        this.submitter = submitter;
+        this.earnedPoints = earnedPoints;
+    }
+
     public Integer getEarnedPoints() {
         return earnedPoints;
     }

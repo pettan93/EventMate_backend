@@ -146,7 +146,7 @@ public class UserResource {
                 .status(HttpStatus.ACCEPTED)
                 .body(result
                         .stream()
-                        .map(eventService::convertToDto)
+                        .map(eventService::convertToLightDto)
                         .collect(Collectors.toList()));
     }
 
@@ -223,7 +223,7 @@ public class UserResource {
                 .body(result
                         .stream()
                         .filter(task -> event.get().getTasks().contains(task))
-                        .map(taskService::convertToDto)
+                        .map(taskService::convertToLightDto)
                         .collect(Collectors.toList()));
     }
 

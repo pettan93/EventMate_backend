@@ -61,7 +61,7 @@ public class EventResource {
                     .build();
 
 
-        return ResponseEntity.ok(eventService.convertToDto(event.get()));
+        return ResponseEntity.ok(eventService.convertToLightDto(event.get()));
     }
 
     /**
@@ -115,7 +115,7 @@ public class EventResource {
 
         return ResponseEntity.ok(event.get().getTasks()
                 .stream()
-                .map(taskService::convertToDto)
+                .map(taskService::convertToLightDto)
                 .collect(Collectors.toList()));
     }
 

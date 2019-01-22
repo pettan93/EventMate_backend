@@ -35,6 +35,14 @@ public class SubmissionFile {
         this.created = created;
     }
 
+    public SubmissionFile(Blob data, String name, String comment, FileType type, Date created) {
+        this.data = data;
+        this.name = name;
+        this.comment = comment;
+        this.type = type;
+        this.created = created;
+    }
+
     public Long getId() {
         return id;
     }
